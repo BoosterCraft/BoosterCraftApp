@@ -15,7 +15,7 @@ class CardViewController: UIViewController {
     let cardTitleBGColor : UIColor
     let imageURL : URL? // unused
     
-    init(cardTitleText: String, cardTitleColor: UIColor, descriptionText: String, cardTitleBGColor: UIColor, imageURL : URL) {
+    init(cardTitleText: String, cardTitleColor: UIColor, descriptionText: String, cardTitleBGColor: UIColor, imageURL : URL?) {
         self.cardTitleText = cardTitleText
         self.cardTitleColor = cardTitleColor
         self.descriptionText =  descriptionText
