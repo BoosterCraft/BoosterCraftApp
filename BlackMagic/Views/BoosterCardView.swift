@@ -72,7 +72,7 @@ class BoosterCardView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        titleLabel.font = UIFont(name: "Bungee-Regular", size: 18)
         titleLabel.textColor = .black
         titleLabel.backgroundColor = titleBackgroundColor
         titleLabel.textAlignment = .center
@@ -86,7 +86,7 @@ class BoosterCardView: UIView {
         
         buyButton.setTitle("BUY NOW", for: .normal)
         buyButton.setTitleColor(.white, for: .normal)
-        buyButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        buyButton.titleLabel?.font = UIFont(name: "Bungee-Regular", size: 18)
         buyButton.backgroundColor = .systemBlue
         buyButton.layer.cornerRadius = 14
         buyButton.addTarget(self, action: #selector(flipCardAnimated), for: .touchUpInside)

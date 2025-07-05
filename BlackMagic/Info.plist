@@ -4,6 +4,7 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Bungee-Regular.ttf</string>
 		<string>PirataOne-Regular.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>

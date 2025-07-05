@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		D613E2742E19147900B80B2E /* PirataOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D613E2732E19147900B80B2E /* PirataOne-Regular.ttf */; };
+		D613E2762E191C9A00B80B2E /* Bungee-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D613E2752E191C9A00B80B2E /* Bungee-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		D613E2732E19147900B80B2E /* PirataOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PirataOne-Regular.ttf"; sourceTree = "<group>"; };
+		D613E2752E191C9A00B80B2E /* Bungee-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bungee-Regular.ttf"; sourceTree = "<group>"; };
 		FA99B7BC2E17EAF600D0CC2C /* BlackMagic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlackMagic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +52,7 @@
 		FA99B7B32E17EAF600D0CC2C = {
 			isa = PBXGroup;
 			children = (
+				D613E2752E191C9A00B80B2E /* Bungee-Regular.ttf */,
 				D613E2732E19147900B80B2E /* PirataOne-Regular.ttf */,
 				FA99B7BE2E17EAF600D0CC2C /* BlackMagic */,
 				FA99B7BD2E17EAF600D0CC2C /* Products */,
@@ -129,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D613E2742E19147900B80B2E /* PirataOne-Regular.ttf in Resources */,
+				D613E2762E191C9A00B80B2E /* Bungee-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +156,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BlackMagic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BlackMagic;
@@ -183,6 +188,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BlackMagic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BlackMagic;
