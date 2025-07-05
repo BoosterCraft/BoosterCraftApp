@@ -74,11 +74,9 @@ class BoosterCardView: UIView {
         imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        
 
         titleLabel.font = UIFont(name: "Bungee-Regular", size: 18)
         titleLabel.textColor = titleColor
-
         titleLabel.backgroundColor = titleBackgroundColor
         titleLabel.textAlignment = .center
         titleLabel.text = title
@@ -90,35 +88,35 @@ class BoosterCardView: UIView {
         descriptionLabel.text = description
         
         buyButton.setTitle("BUY NOW", for: .normal)
-
         buyButton.setTitleColor(buttonTextColor, for: .normal)
         buyButton.titleLabel?.font = UIFont(name: "Bungee-Regular", size: 18)
         buyButton.backgroundColor = .white
         buyButton.layer.cornerRadius = 14
         buyButton.addTarget(self, action: #selector(flipCardAnimated), for: .touchUpInside)
         
-        frontView.addSubviews(imageView, titleLabel, descriptionLabel, buyButton )
-        
-        imageView.pinTop(to: frontView, 16)
-        imageView.pinLeft(to: frontView, 16)
-        imageView.pinRight(to: frontView, 16)
+        frontView.addSubviews(imageView, titleLabel, descriptionLabel, buyButton)
+
+        imageView.pinTop(to: frontView, 0)
+        imageView.pinLeft(to: frontView, 0)
+        imageView.pinRight(to: frontView, 0)
         imageView.setHeight(mode: .equal, 200)
-        
+
         titleLabel.pinTop(to: imageView.bottomAnchor, 0)
         titleLabel.pinLeft(to: frontView)
         titleLabel.pinRight(to: frontView)
         titleLabel.setHeight(mode: .equal, 36)
-        
+
         descriptionLabel.pinTop(to: titleLabel.bottomAnchor, 12)
         descriptionLabel.pinLeft(to: frontView, 16)
         descriptionLabel.pinRight(to: frontView, 16)
-        
+
         buyButton.pinTop(to: descriptionLabel.bottomAnchor, 8)
         buyButton.pinLeft(to: frontView, 16)
         buyButton.pinRight(to: frontView, 16)
         buyButton.setHeight(mode: .equal, 50)
         buyButton.pinBottom(to: frontView, 16)
     }
+
 
     private func setupBack(with data: BoosterBackData) {
         backTitleLabel.font = UIFont.boldSystemFont(ofSize: 20)
