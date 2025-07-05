@@ -39,7 +39,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         layout.scrollDirection = .horizontal
         
         let cardWidth = view.frame.width * 0.75
-        let cardHeight = view.frame.height * 0.52     // Slightly taller cards
+        let cardHeight = view.frame.height * 0.52
         
         let inset = (view.frame.width - cardWidth) / 2
         layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
@@ -51,7 +51,6 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         collectionView.isPagingEnabled = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = .clear
-        
         collectionView.clipsToBounds = false
         
         collectionView.delegate = self
@@ -76,15 +75,13 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         view.backgroundColor = .black
         setupLayout()
         setupCardData()
+        setupPageControl()
     }
     
     // MARK: - Layout
     
     private func setupLayout() {
-        view.addSubview(titleLabel)
-        view.addSubview(balanceButton)
-        view.addSubview(boosterCollectionView)
-        view.addSubview(pageControl)
+        view.addSubviews(titleLabel, balanceButton, boosterCollectionView, pageControl)
         
         titleLabel.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 16)
         titleLabel.pinCenterX(to: view)
@@ -92,7 +89,6 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         balanceButton.pinTop(to: titleLabel.bottomAnchor, 16)
         balanceButton.pinCenterX(to: view)
         
-        // Increased vertical spacing from balanceButton to collectionView
         boosterCollectionView.pinTop(to: balanceButton.bottomAnchor, 40)
         boosterCollectionView.pinLeft(to: view)
         boosterCollectionView.pinRight(to: view)
@@ -122,7 +118,6 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 title: "OUTLAWS OF THUNDER JUCTION",
                 description: "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
                 imageName: "cardImage",
-
                 titleColor: UIColor(red: 255, green: 255, blue: 255),
                 titleBackgroundColor: UIColor(red: 236, green: 90, blue: 43),
                 buttonTextColor: UIColor(red: 236, green: 90, blue: 43),
@@ -136,6 +131,31 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         
         pageControl.numberOfPages = boosterCardsData.count
         boosterCollectionView.reloadData()
+    }
+    
+    // MARK: - Page Control Logic
+    
+    private func setupPageControl() {
+        pageControl.numberOfPages = boosterCardsData.count
+        pageControl.currentPage = 0
+        pageControl.addTarget(self, action: #selector(pageControlDidChange(_:)), for: .valueChanged)
+    }
+    
+    @objc private func pageControlDidChange(_ sender: UIPageControl) {
+        let page = sender.currentPage
+        currentPage = page
+        scrollToPage(page, animated: true)
+    }
+    
+    private func scrollToPage(_ page: Int, animated: Bool) {
+        guard page >= 0 && page < boosterCardsData.count else { return }
+        
+        let indexPath = IndexPath(item: page, section: 0)
+        boosterCollectionView.scrollToItem(
+            at: indexPath,
+            at: .centeredHorizontally,
+            animated: animated
+        )
     }
 }
 
