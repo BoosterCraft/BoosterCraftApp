@@ -48,8 +48,8 @@ class BoosterCardView: UIView {
         
         containerView.pin(to: self)
         
-        frontView.backgroundColor = .clear
-        backView.backgroundColor = .darkGray
+        frontView.backgroundColor = .cardBackground
+        backView.backgroundColor = .cardBackground
         
         frontView.layer.cornerRadius = 20
         backView.layer.cornerRadius = 20
