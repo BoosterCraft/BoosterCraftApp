@@ -9,7 +9,7 @@ class MainTabBarController: UITabBarController {
         setupTabs()
         tabBar.tintColor = .systemBlue
         tabBar.barStyle = .black
-        tabBar.isTranslucent = false
+        tabBar.isTranslucent = true
     }
     
     // MARK: - Setup Tabs
