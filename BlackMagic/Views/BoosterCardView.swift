@@ -23,10 +23,17 @@ class BoosterCardView: UIView {
 
     // MARK: - Init
     
-    init(image: UIImage?, title: String, description: String, titleBackgroundColor: UIColor, backData: BoosterBackData) {
+    init(image: UIImage?,
+         title: String,
+         description: String,
+         titleColor: UIColor,
+         titleBackgroundColor: UIColor,
+         buttonTextColor: UIColor,
+         backData: BoosterBackData)
+    {
         super.init(frame: .zero)
         setupViews()
-        setupFront(image: image, title: title, description: description, titleBackgroundColor: titleBackgroundColor)
+        setupFront(image: image, title: title, description: description, titleColor: titleColor, titleBackgroundColor: titleBackgroundColor, buttonTextColor: buttonTextColor)
         setupBack(with: backData)
         showFront()
     }
@@ -44,13 +51,10 @@ class BoosterCardView: UIView {
         
         containerView.layer.cornerRadius = 20
         containerView.clipsToBounds = true
+        
         addSubview(containerView)
         
         containerView.pin(to: self)
-        
-        frontView.backgroundColor = .cardBackground
-        backView.backgroundColor = .cardBackground
-        
         frontView.layer.cornerRadius = 20
         backView.layer.cornerRadius = 20
         
@@ -60,20 +64,21 @@ class BoosterCardView: UIView {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 4)
         containerView.layer.shadowRadius = 8
 
-        containerView.addSubview(frontView)
-        containerView.addSubview(backView)
+        containerView.addSubviews(frontView, backView)
         
         frontView.pin(to: containerView)
         backView.pin(to: containerView)
     }
 
-    private func setupFront(image: UIImage?, title: String, description: String, titleBackgroundColor: UIColor) {
+    private func setupFront(image: UIImage?, title: String, description: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor) {
         imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
+
         titleLabel.font = UIFont(name: "Bungee-Regular", size: 18)
-        titleLabel.textColor = .black
+        titleLabel.textColor = titleColor
+
         titleLabel.backgroundColor = titleBackgroundColor
         titleLabel.textAlignment = .center
         titleLabel.text = title
@@ -85,16 +90,14 @@ class BoosterCardView: UIView {
         descriptionLabel.text = description
         
         buyButton.setTitle("BUY NOW", for: .normal)
-        buyButton.setTitleColor(.white, for: .normal)
+
+        buyButton.setTitleColor(buttonTextColor, for: .normal)
         buyButton.titleLabel?.font = UIFont(name: "Bungee-Regular", size: 18)
-        buyButton.backgroundColor = .systemBlue
+        buyButton.backgroundColor = .white
         buyButton.layer.cornerRadius = 14
         buyButton.addTarget(self, action: #selector(flipCardAnimated), for: .touchUpInside)
         
-        frontView.addSubview(imageView)
-        frontView.addSubview(titleLabel)
-        frontView.addSubview(descriptionLabel)
-        frontView.addSubview(buyButton)
+        frontView.addSubviews(imageView, titleLabel, descriptionLabel, buyButton )
         
         imageView.pinTop(to: frontView, 16)
         imageView.pinLeft(to: frontView, 16)
@@ -146,12 +149,7 @@ class BoosterCardView: UIView {
         priceButton.backgroundColor = .systemBlue
         priceButton.layer.cornerRadius = 14
         
-        backView.addSubview(backTitleLabel)
-        backView.addSubview(segmentedControl)
-        backView.addSubview(detailsLabel)
-        backView.addSubview(quantityStepper)
-        backView.addSubview(quantityLabel)
-        backView.addSubview(priceButton)
+        backView.addSubviews(backTitleLabel, segmentedControl, detailsLabel, quantityStepper, quantityLabel, priceButton)
         
         backTitleLabel.pinTop(to: backView, 16)
         backTitleLabel.pinLeft(to: backView, 16)
