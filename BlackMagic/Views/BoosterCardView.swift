@@ -2,81 +2,215 @@ import UIKit
 
 class BoosterCardView: UIView {
     
-    // MARK: - UI Elements
-    
+    private let containerView = UIView()
+    private let frontView = UIView()
+    private let backView = UIView()
+    // Front side elements
     private let imageView = UIImageView()
     private let titleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let buyButton = UIButton(type: .system)
     
+    // Back side elements
+    private let backTitleLabel = UILabel()
+    private let segmentedControl = UISegmentedControl(items: ["Play", "Collector"])
+    private let detailsLabel = UILabel()
+    private let quantityStepper = UIStepper()
+    private let quantityLabel = UILabel()
+    private let priceButton = UIButton(type: .system)
+    
+    private var isFrontVisible = true
+
     // MARK: - Init
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupLayout()
+    init(image: UIImage?, title: String, description: String, titleBackgroundColor: UIColor, backData: BoosterBackData) {
+        super.init(frame: .zero)
+        setupViews()
+        setupFront(image: image, title: title, description: description, titleBackgroundColor: titleBackgroundColor)
+        setupBack(with: backData)
+        showFront()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Layout
-    
-    private func setupLayout() {
-        backgroundColor = .darkGray
+
+    // MARK: - Setup
+
+    private func setupViews() {
+        backgroundColor = .clear
         layer.cornerRadius = 20
-        layer.masksToBounds = true
+        clipsToBounds = true
         
+        containerView.layer.cornerRadius = 20
+        containerView.clipsToBounds = true
+        addSubview(containerView)
+        
+        containerView.pin(to: self)
+        
+        frontView.backgroundColor = .clear
+        backView.backgroundColor = .darkGray
+        
+        frontView.layer.cornerRadius = 20
+        backView.layer.cornerRadius = 20
+        
+        // Shadow setup
+        containerView.layer.shadowColor = UIColor.black.cgColor
+        containerView.layer.shadowOpacity = 0.3
+        containerView.layer.shadowOffset = CGSize(width: 0, height: 4)
+        containerView.layer.shadowRadius = 8
+
+        containerView.addSubview(frontView)
+        containerView.addSubview(backView)
+        
+        frontView.pin(to: containerView)
+        backView.pin(to: containerView)
+    }
+
+    private func setupFront(image: UIImage?, title: String, description: String, titleBackgroundColor: UIColor) {
+        imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "default-booster") // placeholder image
         
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textColor = .white
+        titleLabel.textColor = .black
+        titleLabel.backgroundColor = titleBackgroundColor
         titleLabel.textAlignment = .center
+        titleLabel.text = title
         
         descriptionLabel.font = UIFont.systemFont(ofSize: 14)
-        descriptionLabel.textColor = .lightGray
+        descriptionLabel.textColor = .white
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0
+        descriptionLabel.text = description
         
         buyButton.setTitle("BUY NOW", for: .normal)
         buyButton.setTitleColor(.white, for: .normal)
         buyButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        buyButton.backgroundColor = .black
-        buyButton.layer.cornerRadius = 12
-        buyButton.layer.borderWidth = 1
-        buyButton.layer.borderColor = UIColor.white.cgColor
+        buyButton.backgroundColor = .systemBlue
+        buyButton.layer.cornerRadius = 14
+        buyButton.addTarget(self, action: #selector(flipCardAnimated), for: .touchUpInside)
         
-        addSubview(imageView)
-        addSubview(titleLabel)
-        addSubview(descriptionLabel)
-        addSubview(buyButton)
+        frontView.addSubview(imageView)
+        frontView.addSubview(titleLabel)
+        frontView.addSubview(descriptionLabel)
+        frontView.addSubview(buyButton)
         
-        imageView.pinTop(to: self.topAnchor, 16)
-        imageView.pinLeft(to: self, 16)
-        imageView.pinRight(to: self, 16)
+        imageView.pinTop(to: frontView, 16)
+        imageView.pinLeft(to: frontView, 16)
+        imageView.pinRight(to: frontView, 16)
         imageView.setHeight(mode: .equal, 200)
         
-        titleLabel.pinTop(to: imageView.bottomAnchor, 12)
-        titleLabel.pinLeft(to: self, 16)
-        titleLabel.pinRight(to: self, 16)
+        titleLabel.pinTop(to: imageView.bottomAnchor, 0)
+        titleLabel.pinLeft(to: frontView)
+        titleLabel.pinRight(to: frontView)
+        titleLabel.setHeight(mode: .equal, 36)
         
-        descriptionLabel.pinTop(to: titleLabel.bottomAnchor, 8)
-        descriptionLabel.pinLeft(to: self, 16)
-        descriptionLabel.pinRight(to: self, 16)
+        descriptionLabel.pinTop(to: titleLabel.bottomAnchor, 12)
+        descriptionLabel.pinLeft(to: frontView, 16)
+        descriptionLabel.pinRight(to: frontView, 16)
         
-        buyButton.pinTop(to: descriptionLabel.bottomAnchor, 12)
-        buyButton.pinLeft(to: self, 16)
-        buyButton.pinRight(to: self, 16)
+        buyButton.pinTop(to: descriptionLabel.bottomAnchor, 8)
+        buyButton.pinLeft(to: frontView, 16)
+        buyButton.pinRight(to: frontView, 16)
         buyButton.setHeight(mode: .equal, 50)
-        buyButton.pinBottom(to: self, 16)
+        buyButton.pinBottom(to: frontView, 16)
     }
+
+    private func setupBack(with data: BoosterBackData) {
+        backTitleLabel.font = UIFont.boldSystemFont(ofSize: 20)
+        backTitleLabel.textColor = .white
+        backTitleLabel.textAlignment = .center
+        backTitleLabel.text = data.title
+        
+        segmentedControl.selectedSegmentIndex = 0
+        
+        detailsLabel.font = UIFont.systemFont(ofSize: 16)
+        detailsLabel.textColor = .white
+        detailsLabel.numberOfLines = 0
+        detailsLabel.text = data.details
+        
+        quantityStepper.minimumValue = 1
+        quantityStepper.maximumValue = 10
+        quantityStepper.value = 1
+        quantityStepper.addTarget(self, action: #selector(stepperChanged), for: .valueChanged)
+        
+        quantityLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        quantityLabel.textColor = .white
+        quantityLabel.text = "1"
+        quantityLabel.textAlignment = .center
+        
+        priceButton.setTitle("Buy for \(data.price)", for: .normal)
+        priceButton.setTitleColor(.white, for: .normal)
+        priceButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        priceButton.backgroundColor = .systemBlue
+        priceButton.layer.cornerRadius = 14
+        
+        backView.addSubview(backTitleLabel)
+        backView.addSubview(segmentedControl)
+        backView.addSubview(detailsLabel)
+        backView.addSubview(quantityStepper)
+        backView.addSubview(quantityLabel)
+        backView.addSubview(priceButton)
+        
+        backTitleLabel.pinTop(to: backView, 16)
+        backTitleLabel.pinLeft(to: backView, 16)
+        backTitleLabel.pinRight(to: backView, 16)
+        
+        segmentedControl.pinTop(to: backTitleLabel.bottomAnchor, 16)
+        segmentedControl.pinLeft(to: backView, 16)
+        segmentedControl.pinRight(to: backView, 16)
+        
+        detailsLabel.pinTop(to: segmentedControl.bottomAnchor, 16)
+        detailsLabel.pinLeft(to: backView, 16)
+        detailsLabel.pinRight(to: backView, 16)
+        
+        quantityStepper.pinTop(to: detailsLabel.bottomAnchor, 16)
+        quantityStepper.pinLeft(to: backView, 32)
+        
+        quantityLabel.pinCenterY(to: quantityStepper)
+        quantityLabel.pinLeft(to: quantityStepper.trailingAnchor, 12)
+        quantityLabel.setWidth(mode: .equal, 30)
+        
+        priceButton.pinTop(to: quantityStepper.bottomAnchor, 24)
+        priceButton.pinLeft(to: backView, 16)
+        priceButton.pinRight(to: backView, 16)
+        priceButton.setHeight(mode: .equal, 50)
+        priceButton.pinBottom(to: backView, 16)
+        
+        // Tap to flip back
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(flipCardAnimated))
+        backView.addGestureRecognizer(tapGesture)
+    }
+
+    private func showFront() {
+        containerView.bringSubviewToFront(frontView)
+        backView.isHidden = true
+        frontView.isHidden = false
+        isFrontVisible = true
+    }
+
+
+    // MARK: - Actions
     
-    // MARK: - Configure
+    @objc private func flipCardAnimated() {
+        let fromView = isFrontVisible ? frontView : backView
+        let toView = isFrontVisible ? backView : frontView
+
+        toView.isHidden = false // ensure destination is visible before animating
+        
+        UIView.transition(from: fromView,
+                          to: toView,
+                          duration: 0.6,
+                          options: [.transitionFlipFromRight, .showHideTransitionViews]) { _ in
+            fromView.isHidden = true
+        }
+
+        isFrontVisible.toggle()
+    }
+
     
-    func configure(with title: String) {
-        titleLabel.text = title
-        descriptionLabel.text = "Cinematic action, dynamic clan gameplay, and powerful new dragons that add lasting firepower to your collection."
+    @objc private func stepperChanged() {
+        quantityLabel.text = "\(Int(quantityStepper.value))"
     }
 }

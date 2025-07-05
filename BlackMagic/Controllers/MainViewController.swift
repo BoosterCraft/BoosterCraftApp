@@ -1,13 +1,23 @@
 import UIKit
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, UICollectionViewDelegate {
+    
+    // MARK: - Properties
+    
+    private var boosterCardsData: [(title: String, description: String, imageName: String, backData: BoosterBackData)] = []
+    
+    private var currentPage = 0 {
+        didSet {
+            pageControl.currentPage = currentPage
+        }
+    }
     
     // MARK: - UI Elements
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Black magic"
-        label.font = UIFont(name: "Chalkduster", size: 34)
+        label.font = UIFont(name: "PirataOne-Regular", size: 34)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -18,28 +28,45 @@ class MainViewController: UIViewController {
         button.setTitle("$47.92", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        let icon = UIImage(systemName: "creditcard.fill")
-        button.setImage(icon, for: .normal)
+        button.setImage(UIImage(systemName: "creditcard.fill"), for: .normal)
         button.tintColor = .systemBlue
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0)
         return button
     }()
     
-    private let boosterScrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.isPagingEnabled = true
-        scrollView.backgroundColor = .clear
-        return scrollView
+    private lazy var boosterCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        
+        let cardWidth = view.frame.width * 0.75
+        let cardHeight = view.frame.height * 0.52     // Slightly taller cards
+        
+        let inset = (view.frame.width - cardWidth) / 2
+        layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        
+        layout.minimumLineSpacing = 16
+        layout.itemSize = CGSize(width: cardWidth, height: cardHeight)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.isPagingEnabled = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = .clear
+        
+        collectionView.clipsToBounds = false
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(BoosterCardCell.self, forCellWithReuseIdentifier: BoosterCardCell.cellId)
+        collectionView.decelerationRate = .fast
+        return collectionView
     }()
     
     private let pageControl: UIPageControl = {
-        let pageControl = UIPageControl()
-        pageControl.currentPage = 0
-        pageControl.numberOfPages = 3
-        pageControl.currentPageIndicatorTintColor = .white
-        pageControl.pageIndicatorTintColor = .darkGray
-        return pageControl
+        let pc = UIPageControl()
+        pc.currentPage = 0
+        pc.currentPageIndicatorTintColor = .white
+        pc.pageIndicatorTintColor = .darkGray
+        return pc
     }()
     
     // MARK: - Lifecycle
@@ -48,7 +75,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupLayout()
-        setupScrollViewContent()
+        setupCardData()
     }
     
     // MARK: - Layout
@@ -56,65 +83,120 @@ class MainViewController: UIViewController {
     private func setupLayout() {
         view.addSubview(titleLabel)
         view.addSubview(balanceButton)
-        view.addSubview(boosterScrollView)
+        view.addSubview(boosterCollectionView)
         view.addSubview(pageControl)
         
         titleLabel.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 16)
         titleLabel.pinCenterX(to: view)
         
-        balanceButton.pinTop(to: titleLabel.bottomAnchor, 8)
+        balanceButton.pinTop(to: titleLabel.bottomAnchor, 16)
         balanceButton.pinCenterX(to: view)
         
-        boosterScrollView.pinTop(to: balanceButton.bottomAnchor, 32)
-        boosterScrollView.pinLeft(to: view)
-        boosterScrollView.pinRight(to: view)
-        boosterScrollView.pinHeight(to: view.heightAnchor, 0.6)
+        // Increased vertical spacing from balanceButton to collectionView
+        boosterCollectionView.pinTop(to: balanceButton.bottomAnchor, 40)
+        boosterCollectionView.pinLeft(to: view)
+        boosterCollectionView.pinRight(to: view)
+        boosterCollectionView.pinHeight(to: view.heightAnchor, 0.52)   // Increased height
         
-        pageControl.pinTop(to: boosterScrollView.bottomAnchor, 16)
+        // PageControl positioned with some spacing below collectionView to avoid overlap
+        pageControl.pinTop(to: boosterCollectionView.bottomAnchor, 48)
         pageControl.pinCenterX(to: view)
-        
-        boosterScrollView.delegate = self
     }
     
-    private func setupScrollViewContent() {
-        let cardWidth = view.frame.width * 0.85
-        let padding: CGFloat = 16
-        
-        let boosterSets = [
-            "TARKIR: DRAGONSTORM",
-            "INNISTRAD: MOONRISE",
-            "RAVNICA: CHAOS"
+    private func setupCardData() {
+        boosterCardsData = [
+            (
+                "TARKIR: DRAGONSTORM",
+                "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
+                "cardImage",
+                BoosterBackData(
+                    title: "TDM booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
+                    price: "$26.28"
+                )
+            ),
+            (
+                "INNISTRAD: MOONRISE",
+                "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
+                "cardImage",
+                BoosterBackData(
+                    title: "Moonrise Pack",
+                    details: "• 3 Rare\n• 4 Uncommon\n• 7 Common\n• 1 Token card",
+                    price: "$19.80"
+                )
+            ),
+            (
+                "RAVNICA: CHAOS",
+                "Guild battles, hybrid spells, and a multicolor city plane in chaos.",
+                "cardImage",
+                BoosterBackData(
+                    title: "Ravnica Booster",
+                    details: "• 4 Rare or Mythic\n• 3 Uncommon\n• 8 Common\n• 1 Guildgate",
+                    price: "$22.50"
+                )
+            )
         ]
         
-        for (index, setName) in boosterSets.enumerated() {
-            let cardView = BoosterCardView()
-            cardView.configure(with: setName)
-            boosterScrollView.addSubview(cardView)
-            
-            cardView.setWidth( mode: .equal, Double(cardWidth))
-            cardView.pinHeight(to: boosterScrollView.heightAnchor)
-            cardView.pinTop(to: boosterScrollView.topAnchor)
-            
-            if index == 0 {
-                cardView.pinLeft(to: boosterScrollView, Double(padding))
-            } else {
-                let previousCard = boosterScrollView.subviews[index - 1]
-                cardView.pinLeft(to: previousCard.trailingAnchor, Double(padding))
-            }
-        }
+        pageControl.numberOfPages = boosterCardsData.count
+        boosterCollectionView.reloadData()
+    }
+}
+
+// MARK: - UICollectionViewDataSource
+
+extension MainViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        boosterCardsData.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BoosterCardCell.cellId, for: indexPath) as! BoosterCardCell
         
-        if let lastCard = boosterScrollView.subviews.last {
-            lastCard.pinRight(to: boosterScrollView, Double(padding))
-        }
+        let data = boosterCardsData[indexPath.item]
+        let cardView = BoosterCardView(
+            image: UIImage(named: data.imageName),
+            title: data.title,
+            description: data.description,
+            titleBackgroundColor: UIColor(red: 219/255, green: 240/255, blue: 252/255, alpha: 1),
+            backData: data.backData
+        )
+        cell.configure(with: cardView)
+        return cell
     }
 }
 
 // MARK: - UIScrollViewDelegate
 
 extension MainViewController: UIScrollViewDelegate {
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView,
+                                   withVelocity velocity: CGPoint,
+                                   targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        guard let layout = boosterCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        
+        let cardWidthIncludingSpacing = layout.itemSize.width + layout.minimumLineSpacing
+        let proposedOffsetX = targetContentOffset.pointee.x + boosterCollectionView.contentInset.left
+        
+        var pageIndex = round(proposedOffsetX / cardWidthIncludingSpacing)
+        pageIndex = max(0, min(pageIndex, CGFloat(boosterCardsData.count - 1)))
+        
+        let newOffsetX = pageIndex * cardWidthIncludingSpacing - boosterCollectionView.contentInset.left
+        targetContentOffset.pointee.x = newOffsetX
+        
+        currentPage = Int(pageIndex)
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let pageWidth = view.frame.width * 0.85 + 16
-        let currentPage = Int((scrollView.contentOffset.x + (0.5 * pageWidth)) / pageWidth)
-        pageControl.currentPage = currentPage
+        guard let layout = boosterCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        
+        let cardWidthIncludingSpacing = layout.itemSize.width + layout.minimumLineSpacing
+        let offsetX = scrollView.contentOffset.x + boosterCollectionView.contentInset.left
+        let page = Int(round(offsetX / cardWidthIncludingSpacing))
+        
+        if page >= 0 && page < boosterCardsData.count {
+            pageControl.currentPage = page
+            currentPage = page
+        }
     }
 }
