@@ -106,12 +106,12 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     private func setupCardData() {
         boosterCardsData = [
             (
-                "TARKIR: DRAGONSTORM",
-                "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
-                "cardImage",
-                UIColor(red: 34/255, green: 45/255, blue: 87/255, alpha: 1),
-                UIColor(red: 219/255, green: 240/255, blue: 252/255, alpha: 1),
-                UIColor(red: 34/255, green: 45/255, blue: 87/255, alpha: 1),
+                title: "TARKIR: DRAGONSTORM",
+                description: "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
+                imageName: "cardImage",
+                titleColor: UIColor(red: 34, green: 45, blue: 87),
+                titleBackgroundColor: UIColor(red: 219, green: 240, blue: 252),
+                buttonTextColor: UIColor(red: 34, green: 45, blue: 87),
                 BoosterBackData(
                     title: "TDM booster",
                     details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
@@ -119,13 +119,13 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 )
             ),
             (
-                "OUTLAWS OF THUNDER JUCTION",
-                "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
-                "cardImage",
-//                rgba(236, 90, 43, 1)
-                UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1),
-                UIColor(red: 236/255, green: 90/255, blue: 43/255, alpha: 1),
-                UIColor(red: 236/255, green: 90/255, blue: 43/255, alpha: 1),
+                title: "OUTLAWS OF THUNDER JUCTION",
+                description: "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
+                imageName: "cardImage",
+
+                titleColor: UIColor(red: 255, green: 255, blue: 255),
+                titleBackgroundColor: UIColor(red: 236, green: 90, blue: 43),
+                buttonTextColor: UIColor(red: 236, green: 90, blue: 43),
                 BoosterBackData(
                     title: "Moonrise Pack",
                     details: "• 3 Rare\n• 4 Uncommon\n• 7 Common\n• 1 Token card",
