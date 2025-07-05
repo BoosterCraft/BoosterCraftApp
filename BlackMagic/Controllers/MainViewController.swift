@@ -4,7 +4,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     
     // MARK: - Properties
     
-    private var boosterCardsData: [(title: String, description: String, imageName: String, backData: BoosterBackData)] = []
+    private var boosterCardsData: [(title: String, description: String, imageName: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, backData: BoosterBackData)] = []
     
     private var currentPage = 0 {
         didSet {
@@ -109,6 +109,9 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 "TARKIR: DRAGONSTORM",
                 "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
                 "cardImage",
+                UIColor(red: 34/255, green: 45/255, blue: 87/255, alpha: 1),
+                UIColor(red: 219/255, green: 240/255, blue: 252/255, alpha: 1),
+                UIColor(red: 34/255, green: 45/255, blue: 87/255, alpha: 1),
                 BoosterBackData(
                     title: "TDM booster",
                     details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
@@ -116,23 +119,17 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 )
             ),
             (
-                "INNISTRAD: MOONRISE",
+                "OUTLAWS OF THUNDER JUCTION",
                 "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
                 "cardImage",
+//                rgba(236, 90, 43, 1)
+                UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1),
+                UIColor(red: 236/255, green: 90/255, blue: 43/255, alpha: 1),
+                UIColor(red: 236/255, green: 90/255, blue: 43/255, alpha: 1),
                 BoosterBackData(
                     title: "Moonrise Pack",
                     details: "• 3 Rare\n• 4 Uncommon\n• 7 Common\n• 1 Token card",
                     price: "$19.80"
-                )
-            ),
-            (
-                "RAVNICA: CHAOS",
-                "Guild battles, hybrid spells, and a multicolor city plane in chaos.",
-                "cardImage",
-                BoosterBackData(
-                    title: "Ravnica Booster",
-                    details: "• 4 Rare or Mythic\n• 3 Uncommon\n• 8 Common\n• 1 Guildgate",
-                    price: "$22.50"
                 )
             )
         ]
@@ -157,7 +154,9 @@ extension MainViewController: UICollectionViewDataSource {
             image: UIImage(named: data.imageName),
             title: data.title,
             description: data.description,
-            titleBackgroundColor: UIColor(red: 219/255, green: 240/255, blue: 252/255, alpha: 1),
+            titleColor: data.titleColor,
+            titleBackgroundColor: data.titleBackgroundColor,
+            buttonTextColor: data.buttonTextColor,
             backData: data.backData
         )
         cell.configure(with: cardView)
