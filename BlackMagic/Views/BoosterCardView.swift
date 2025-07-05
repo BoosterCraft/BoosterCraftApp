@@ -45,7 +45,7 @@ class BoosterCardView: UIView {
     // MARK: - Setup
 
     private func setupViews() {
-        backgroundColor = .clear
+        backgroundColor = UIColor(red: 37, green: 37, blue: 37)
         layer.cornerRadius = 20
         clipsToBounds = true
         
