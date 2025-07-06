@@ -16,8 +16,7 @@ class MainTabBarController: UITabBarController {
     
     private func setupTabs() {
         let mainVC = MainViewController()
-        let boostersVC = UIViewController()
-        boostersVC.view.backgroundColor = .black
+        let boostersVC = OpenBoostersViewController()
         let collectionVC = UIViewController()
         collectionVC.view.backgroundColor = .black
         

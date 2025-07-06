@@ -7,21 +7,35 @@
 
 import UIKit
 
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: windowScene)
-        window?.windowScene = windowScene
-        
-        let tabBarController = MainTabBarController()
-        window?.rootViewController = tabBarController
-        window?.makeKeyAndVisible()
-    }
+//    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+//        guard let windowScene = (scene as? UIWindowScene) else { return }
+//        window = UIWindow(windowScene: windowScene)
+//        window?.windowScene = windowScene
+//        
+////        let tabBarController = MainTabBarController()
+////        let tabBarController = OpenBoostersViewController()
+//        let tabBarController = UINavigationController(rootViewController: OpenBoostersViewController())
+//        window?.rootViewController = tabBarController
+//        window?.makeKeyAndVisible()
+//    }
+    
+        func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+            guard let windowScene = (scene as? UIWindowScene) else { return }
 
+            let window = UIWindow(windowScene: windowScene)
+            let mainTabBarController = MainTabBarController()
+            window.rootViewController = mainTabBarController
+            self.window = window
+            window.makeKeyAndVisible()
+        }
+    
+    
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.
