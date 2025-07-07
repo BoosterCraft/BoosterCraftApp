@@ -79,9 +79,10 @@ final class OpenBoostersViewController: UIViewController {
         layout.itemSize = CGSize(width: 111, height: 155)
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 14
-
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .black
+        collectionView.clipsToBounds = false
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(OpenBoosterCardCell.self, forCellWithReuseIdentifier: OpenBoosterCardCell.identifier)

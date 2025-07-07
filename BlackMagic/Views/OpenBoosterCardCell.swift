@@ -7,6 +7,8 @@ final class OpenBoosterCardCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        clipsToBounds = false
+        contentView.clipsToBounds = false
         contentView.addSubview(cardView)
         cardView.pin(to: contentView)
     }
