@@ -4,6 +4,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     
     // MARK: - Properties
     
+    private var boosterData: [BoosterData] = []
     private var boosterCardsData: [(title: String, description: String, imageName: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, backData: BoosterBackData)] = []
     
     private var currentPage = 0 {
@@ -74,7 +75,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupLayout()
-        setupCardData()
+        loadBoosterData()
         setupPageControl()
     }
     
@@ -99,38 +100,123 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         pageControl.pinCenterX(to: view)
     }
     
-    private func setupCardData() {
-        boosterCardsData = [
+    private func loadBoosterData() {
+        // Use predefined boosters for now
+        boosterData = BoosterData.predefinedBoosters
+        
+        // Convert to the format expected by the collection view
+        boosterCardsData = boosterData.map { booster in
             (
-                title: "TARKIR: DRAGONSTORM",
-                description: "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
-                imageName: "cardImage",
-                titleColor: UIColor(red: 34, green: 45, blue: 87),
-                titleBackgroundColor: UIColor(red: 219, green: 240, blue: 252),
-                buttonTextColor: UIColor(red: 34, green: 45, blue: 87),
+                title: booster.setName,
+                description: booster.description,
+                imageName: booster.imageName,
+                titleColor: booster.titleColor,
+                titleBackgroundColor: booster.titleBackgroundColor,
+                buttonTextColor: booster.buttonTextColor,
                 BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$26.28"
-                )
-            ),
-            (
-                title: "OUTLAWS OF THUNDER JUCTION",
-                description: "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
-                imageName: "cardImage",
-                titleColor: UIColor(red: 255, green: 255, blue: 255),
-                titleBackgroundColor: UIColor(red: 236, green: 90, blue: 43),
-                buttonTextColor: UIColor(red: 236, green: 90, blue: 43),
-                BoosterBackData(
-                    title: "Moonrise Pack",
-                    details: "• 3 Rare\n• 4 Uncommon\n• 7 Common\n• 1 Token card",
-                    price: "$19.80"
+                    title: "\(booster.setCode.uppercased()) Booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land\n• Cards \(booster.cardRange.lowerBound)-\(booster.cardRange.upperBound)",
+                    price: booster.price
                 )
             )
-        ]
+        }
         
         pageControl.numberOfPages = boosterCardsData.count
         boosterCollectionView.reloadData()
+        
+        // Optionally fetch additional data from Scryfall API
+        fetchSetDataFromAPI()
+    }
+    
+    private func fetchSetDataFromAPI() {
+        // This method can be used to fetch additional set information from Scryfall
+        print("Could fetch additional set data from Scryfall API for \(boosterData.count) sets")
+        
+        // Example: Fetch cards for the first booster (TDM)
+        if let firstBooster = boosterData.first {
+            ScryfallAPIService.shared.fetchCards(forSet: firstBooster.setCode, numberRange: firstBooster.cardRange) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let cards):
+                        print("✅ Successfully fetched \(cards.count) cards for \(firstBooster.setCode.uppercased()) set")
+                        // Here you could store the cards or use them for booster opening
+                        self.handleFetchedCards(cards, forSet: firstBooster.setCode)
+                    case .failure(let error):
+                        print("❌ Error fetching cards for \(firstBooster.setCode): \(error)")
+                    }
+                }
+            }
+        }
+        
+        // Fetch set icons for all boosters
+        fetchSetIconsForBoosters()
+    }
+    
+    private func fetchSetIconsForBoosters() {
+        for (index, booster) in boosterData.enumerated() {
+            ScryfallAPIService.shared.fetchSet(byCode: booster.setCode) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let set):
+                        print("✅ Fetched set icon for \(booster.setCode): \(set.iconSvgUri ?? "No icon")")
+                        // You could update the booster data here if needed
+                        // For now, we're using the predefined URLs
+                    case .failure(let error):
+                        print("❌ Error fetching set info for \(booster.setCode): \(error)")
+                    }
+                }
+            }
+        }
+    }
+    
+    private func handleFetchedCards(_ cards: [ScryfallCard], forSet setCode: String) {
+        // This method handles the fetched cards
+        // You could store them in a cache, use them for booster opening, etc.
+        print("📦 Received \(cards.count) cards for set \(setCode)")
+        
+        // Example: Print first few cards
+        let firstCards = Array(cards.prefix(3))
+        for card in firstCards {
+            print("  - \(card.name) (\(card.rarity))")
+        }
+    }
+    
+    // Method to fetch cards for a specific booster (can be called when user wants to open a booster)
+    func fetchCardsForBooster(_ booster: BoosterData, completion: @escaping ([ScryfallCard]) -> Void) {
+        ScryfallAPIService.shared.fetchCards(forSet: booster.setCode, numberRange: booster.cardRange) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let cards):
+                    print("✅ Fetched \(cards.count) cards for \(booster.setCode.uppercased()) booster")
+                    completion(cards)
+                case .failure(let error):
+                    print("❌ Error fetching cards for \(booster.setCode): \(error)")
+                    completion([])
+                }
+            }
+        }
+    }
+    
+    // Method to open a booster and get random cards
+    func openBooster(_ booster: BoosterData, completion: @escaping ([ScryfallCard], Double) -> Void) {
+        fetchCardsForBooster(booster) { cards in
+            if !cards.isEmpty {
+                let openedCards = BoosterOpeningService.shared.openBooster(from: cards)
+                let totalValue = BoosterOpeningService.shared.calculateBoosterValue(openedCards)
+                
+                print("🎉 Opened \(booster.setCode.uppercased()) booster!")
+                print("📦 Got \(openedCards.count) cards with total value: $\(String(format: "%.2f", totalValue))")
+                
+                for card in openedCards {
+                    let value = BoosterOpeningService.shared.getCardValue(card)
+                    print("  - \(card.name) (\(card.rarity)) - $\(String(format: "%.2f", value))")
+                }
+                
+                completion(openedCards, totalValue)
+            } else {
+                completion([], 0.0)
+            }
+        }
     }
     
     // MARK: - Page Control Logic
@@ -148,7 +234,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     }
     
     private func scrollToPage(_ page: Int, animated: Bool) {
-        guard page >= 0 && page < boosterCardsData.count else { return }
+        guard page >= 0 && page < boosterData.count else { return }
         
         let indexPath = IndexPath(item: page, section: 0)
         boosterCollectionView.scrollToItem(
@@ -163,22 +249,20 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
 
 extension MainViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        boosterCardsData.count
+        boosterData.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BoosterCardCell.cellId, for: indexPath) as! BoosterCardCell
         
-        let data = boosterCardsData[indexPath.item]
-        let cardView = BoosterCardView(
-            image: UIImage(named: data.imageName),
-            title: data.title,
-            description: data.description,
-            titleColor: data.titleColor,
-            titleBackgroundColor: data.titleBackgroundColor,
-            buttonTextColor: data.buttonTextColor,
-            backData: data.backData
+        let booster = boosterData[indexPath.item]
+        let backData = BoosterBackData(
+            title: "\(booster.setCode.uppercased()) Booster",
+            details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land\n• Cards \(booster.cardRange.lowerBound)-\(booster.cardRange.upperBound)",
+            price: booster.price
         )
+        
+        let cardView = BoosterCardView(boosterData: booster, backData: backData)
         cell.configure(with: cardView)
         return cell
     }
@@ -198,7 +282,7 @@ extension MainViewController: UIScrollViewDelegate {
         let proposedOffsetX = targetContentOffset.pointee.x + boosterCollectionView.contentInset.left
         
         var pageIndex = round(proposedOffsetX / cardWidthIncludingSpacing)
-        pageIndex = max(0, min(pageIndex, CGFloat(boosterCardsData.count - 1)))
+        pageIndex = max(0, min(pageIndex, CGFloat(boosterData.count - 1)))
         
         let newOffsetX = pageIndex * cardWidthIncludingSpacing - boosterCollectionView.contentInset.left
         targetContentOffset.pointee.x = newOffsetX
@@ -213,7 +297,7 @@ extension MainViewController: UIScrollViewDelegate {
         let offsetX = scrollView.contentOffset.x + boosterCollectionView.contentInset.left
         let page = Int(round(offsetX / cardWidthIncludingSpacing))
         
-        if page >= 0 && page < boosterCardsData.count {
+        if page >= 0 && page < boosterData.count {
             pageControl.currentPage = page
             currentPage = page
         }

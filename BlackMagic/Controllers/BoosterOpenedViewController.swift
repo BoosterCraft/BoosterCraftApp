@@ -25,17 +25,17 @@ final class BoosterOpenedViewController: UIViewController {
     private let sellSelectedButton = BoosterOpenedViewController.makeButton(title: "Sell selected", bgColor: .systemGray)
     private let keepAllButton = BoosterOpenedViewController.makeButton(title: "Keep all", bgColor: .systemBlue)
 
-    private var boosterData: [Booster] = [
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
-        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
-        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
-        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "WOE", type: "Draft", count: 2, color: .purple),
-        Booster(set: "XYZ", type: "Draft", count: 3, color: .systemRed),
-        Booster(set: "NEO", type: "SET", count: 1, color: .systemPink)
+    private var boosterData: [BoosterBought] = [
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        BoosterBought(set: "WOE", type: "Draft", count: 3, color: .purple),
+        BoosterBought(set: "NEO", type: "SET", count: 2, color: .systemPink),
+        BoosterBought(set: "ABC", type: "Play", count: 4, color: .systemGreen),
+        BoosterBought(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "WOE", type: "Draft", count: 2, color: .purple),
+        BoosterBought(set: "XYZ", type: "Draft", count: 3, color: .systemRed),
+        BoosterBought(set: "NEO", type: "SET", count: 1, color: .systemPink)
     ]
 
     // MARK: - Lifecycle

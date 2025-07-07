@@ -37,6 +37,24 @@ class BoosterCardView: UIView {
         setupBack(with: backData)
         showFront()
     }
+    
+    init(boosterData: BoosterData, backData: BoosterBackData) {
+        super.init(frame: .zero)
+        setupViews()
+        setupFront(
+            image: nil, // Don't set default image initially
+            title: boosterData.setName,
+            description: boosterData.description,
+            titleColor: boosterData.titleColor,
+            titleBackgroundColor: boosterData.titleBackgroundColor,
+            buttonTextColor: boosterData.buttonTextColor
+        )
+        setupBack(with: backData)
+        showFront()
+        
+        // Create and display set-specific icon
+        createSetIcon(for: boosterData.setCode)
+    }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -208,5 +226,87 @@ class BoosterCardView: UIView {
     
     @objc private func stepperChanged() {
         quantityLabel.text = "\(Int(quantityStepper.value))"
+    }
+    
+    // MARK: - Set Icon Creation
+    
+    private func createSetIcon(for setCode: String) {
+        print("🎨 Creating set icon for: \(setCode)")
+        
+        if let setIcon = SVGConverter.createSetIcon(for: setCode, size: CGSize(width: 120, height: 120)) {
+            // Clear the current image view
+            imageView.image = nil
+            imageView.subviews.forEach { $0.removeFromSuperview() }
+            
+            // Create a background view with the set icon
+            let backgroundView = UIView()
+            backgroundView.backgroundColor = UIColor(red: 37/255, green: 37/255, blue: 37/255)
+            backgroundView.layer.cornerRadius = 20
+            backgroundView.clipsToBounds = true
+            
+            let iconImageView = UIImageView(image: setIcon)
+            iconImageView.contentMode = .scaleAspectFit
+            iconImageView.alpha = 0.8 // Make it more visible
+            
+            backgroundView.addSubview(iconImageView)
+            iconImageView.pinCenterX(to: backgroundView)
+            iconImageView.pinCenterY(to: backgroundView)
+            iconImageView.setWidth(mode: .equal, 100)
+            iconImageView.setHeight(mode: .equal, 100)
+            
+            // Add the background view to the image view
+            imageView.addSubview(backgroundView)
+            backgroundView.pin(to: imageView)
+            
+            print("✅ Successfully created set icon for \(setCode)")
+        } else {
+            print("❌ Failed to create set icon, using fallback")
+            // Fallback to default image
+            imageView.image = UIImage(named: "cardImage")
+        }
+    }
+    
+    // MARK: - Set Icon Loading (Alternative method for SVG URLs)
+    
+    private func loadSetIcon(from urlString: String) {
+        print("🔄 Loading set icon from: \(urlString)")
+        
+        ImageLoadingService.shared.loadImage(from: urlString) { [weak self] image in
+            DispatchQueue.main.async {
+                if let image = image {
+                    print("✅ Successfully loaded set icon")
+                    
+                    // Clear the current image view
+                    self?.imageView.image = nil
+                    self?.imageView.subviews.forEach { $0.removeFromSuperview() }
+                    
+                    // Create a background view with the set icon
+                    let backgroundView = UIView()
+                    backgroundView.backgroundColor = UIColor(red: 37/255, green: 37/255, blue: 37/255)
+                    backgroundView.layer.cornerRadius = 20
+                    backgroundView.clipsToBounds = true
+                    
+                    let iconImageView = UIImageView(image: image)
+                    iconImageView.contentMode = .scaleAspectFit
+                    iconImageView.tintColor = .white
+                    iconImageView.alpha = 0.4 // Make it subtle but visible
+                    
+                    backgroundView.addSubview(iconImageView)
+                    iconImageView.pinCenterX(to: backgroundView)
+                    iconImageView.pinCenterY(to: backgroundView)
+                    iconImageView.setWidth(mode: .equal, 100)
+                    iconImageView.setHeight(mode: .equal, 100)
+                    
+                    // Add the background view to the image view
+                    self?.imageView.addSubview(backgroundView)
+                    backgroundView.pin(to: self?.imageView ?? UIView())
+                    
+                } else {
+                    print("❌ Failed to load set icon, using fallback")
+                    // Fallback to default image
+                    self?.imageView.image = UIImage(named: "cardImage")
+                }
+            }
+        }
     }
 }

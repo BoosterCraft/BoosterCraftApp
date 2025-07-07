@@ -16,25 +16,23 @@ final class OpenBoostersViewController: UIViewController {
 
     private var collectionView: UICollectionView!
 
-    private let boosterData: [Booster] = [
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
-        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
-        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
-        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
-        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
-        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
-        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
-        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
-        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
-        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+    private let boosterData: [BoosterBought] = [
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        BoosterBought(set: "WOE", type: "Draft", count: 3, color: .purple),
+        BoosterBought(set: "NEO", type: "SET", count: 2, color: .systemPink),
+        BoosterBought(set: "ABC", type: "Play", count: 4, color: .systemGreen),
+        BoosterBought(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        BoosterBought(set: "WOE", type: "Draft", count: 3, color: .purple),
+        BoosterBought(set: "NEO", type: "SET", count: 2, color: .systemPink),
+        BoosterBought(set: "ABC", type: "Play", count: 4, color: .systemGreen),
+        BoosterBought(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+        BoosterBought(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        BoosterBought(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
 
     ]
 
