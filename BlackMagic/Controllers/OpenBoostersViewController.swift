@@ -76,9 +76,9 @@ final class OpenBoostersViewController: UIViewController {
 
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 100, height: 160)
+        layout.itemSize = CGSize(width: 111, height: 155)
         layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 16
+        layout.minimumInteritemSpacing = 14
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .black

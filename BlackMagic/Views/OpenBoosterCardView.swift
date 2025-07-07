@@ -2,21 +2,16 @@ import UIKit
 
 final class OpenBoosterCardView: UIView {
 
-    // MARK: - Views
-
     private let frontView = UIView()
     private let backView = UIView()
 
-    // Front side elements
     private let setLabel = UILabel()
     private let typeLabel = UILabel()
     private let boosterLabel = UILabel()
-    private let countCircle = UILabel()
 
-    // Back side elements
+    private let badgeLabel = UILabel()  // badge moved to self
+
     private let backTextLabel = UILabel()
-
-    // MARK: - State
 
     private var isFrontVisible = true
 
@@ -25,21 +20,23 @@ final class OpenBoosterCardView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
-        clipsToBounds = true
+        clipsToBounds = false  // <- allow badge to overflow
 
         setupFront()
         setupBack()
 
         addSubview(frontView)
         addSubview(backView)
+        addSubview(badgeLabel) // badge added to self, not frontView
 
         frontView.pin(to: self)
         backView.pin(to: self)
-
         backView.isHidden = true
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(flipCard))
         addGestureRecognizer(tap)
+
+        setupBadge()
     }
 
     required init?(coder: NSCoder) {
@@ -53,7 +50,7 @@ final class OpenBoosterCardView: UIView {
         frontView.layer.cornerRadius = 16
         frontView.clipsToBounds = true
 
-        [setLabel, typeLabel, boosterLabel, countCircle].forEach {
+        [setLabel, typeLabel, boosterLabel].forEach {
             frontView.addSubview($0)
         }
 
@@ -72,13 +69,6 @@ final class OpenBoosterCardView: UIView {
         boosterLabel.textColor = .lightGray
         boosterLabel.textAlignment = .center
 
-        countCircle.font = UIFont.boldSystemFont(ofSize: 16)
-        countCircle.textColor = .white
-        countCircle.textAlignment = .center
-        countCircle.backgroundColor = .systemBlue
-        countCircle.layer.cornerRadius = 16
-        countCircle.clipsToBounds = true
-
         setLabel.pinTop(to: frontView, 8)
         setLabel.pinLeft(to: frontView, 8)
         setLabel.pinRight(to: frontView, 8)
@@ -91,11 +81,6 @@ final class OpenBoosterCardView: UIView {
         boosterLabel.pinTop(to: typeLabel.bottomAnchor, 4)
         boosterLabel.pinLeft(to: frontView, 8)
         boosterLabel.pinRight(to: frontView, 8)
-
-        countCircle.pinBottom(to: frontView, 12)
-        countCircle.pinCenterX(to: frontView)
-        countCircle.setWidth(32)
-        countCircle.setHeight(32)
     }
 
     private func setupBack() {
@@ -108,8 +93,26 @@ final class OpenBoosterCardView: UIView {
         backTextLabel.numberOfLines = 0
         backTextLabel.textAlignment = .center
         backTextLabel.text = "Back side.\nTap to flip."
+
         backView.addSubview(backTextLabel)
         backTextLabel.pinCenter(to: backView)
+    }
+
+    private func setupBadge() {
+        badgeLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        badgeLabel.textColor = .white
+        badgeLabel.textAlignment = .center
+        badgeLabel.backgroundColor = .systemBlue
+        badgeLabel.layer.cornerRadius = 12
+        badgeLabel.clipsToBounds = true
+        badgeLabel.layer.borderWidth = 2
+        badgeLabel.layer.borderColor = UIColor.black.cgColor
+
+        // Size & position: bottom-right overhanging by 8pt
+        badgeLabel.setWidth(24)
+        badgeLabel.setHeight(24)
+        badgeLabel.pinBottom(to: self, -8)
+        badgeLabel.pinRight(to: self, -8)
     }
 
     // MARK: - Public Configuration
@@ -119,10 +122,11 @@ final class OpenBoosterCardView: UIView {
         setLabel.backgroundColor = color
         typeLabel.text = type
         boosterLabel.text = "booster"
-        countCircle.text = "\(count)"
+        badgeLabel.text = "\(count)"
+        badgeLabel.isHidden = (count == 0)
     }
 
-    // MARK: - Actions
+    // MARK: - Flip Animation
 
     @objc private func flipCard() {
         let fromView = isFrontVisible ? frontView : backView
