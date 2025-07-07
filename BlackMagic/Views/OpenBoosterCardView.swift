@@ -11,7 +11,10 @@ final class OpenBoosterCardView: UIView {
     
     private let badgeLabel = UILabel()  // badge moved to self
     
-    private let backTextLabel = UILabel()
+//    private let backTextLabel = UILabel()
+    private let openButton = UIButton()
+    private let closeButton = UIButton()
+    private let backStackView = UIStackView()
     
     private var isFrontVisible = true
     
@@ -88,14 +91,44 @@ final class OpenBoosterCardView: UIView {
         backView.layer.cornerRadius = 16
         backView.clipsToBounds = true
         
-        backTextLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        backTextLabel.textColor = .white
-        backTextLabel.numberOfLines = 0
-        backTextLabel.textAlignment = .center
-        backTextLabel.text = "Back side.\nTap to flip."
+//        backTextLabel.font = UIFont.boldSystemFont(ofSize: 18)
+//        backTextLabel.textColor = .white
+//        backTextLabel.numberOfLines = 0
+//        backTextLabel.textAlignment = .center
+//        backTextLabel.text = "Back side.\nTap to flip."
         
-        backView.addSubview(backTextLabel)
-        backTextLabel.pinCenter(to: backView)
+        
+        openButton.setTitle("Open", for: .normal)
+        openButton.setTitleColor(.white, for: .normal)
+        openButton.backgroundColor = UIColor(named: "openColor") ?? .systemBlue
+        openButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        openButton.layer.cornerRadius = 14
+        
+        closeButton.setTitle("Close", for: .normal)
+        closeButton.setTitleColor(.systemGray, for: .normal)
+//        closeButton.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        closeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        closeButton.layer.cornerRadius = 14
+        
+//        backView.addSubview(backTextLabel)
+        backStackView.axis = .vertical
+        backStackView.spacing = 12
+        backStackView.alignment = .center
+        backStackView.distribution = .equalSpacing
+
+        backStackView.addArrangedSubview(openButton)
+        backStackView.addArrangedSubview(closeButton)
+        
+        backView.addSubview(backStackView)
+        // constraints
+        backStackView.pinCenterX(to: backView.centerXAnchor)
+        backStackView.pinCenterY(to: backView.centerYAnchor)
+        
+        openButton.setHeight(50)
+        openButton.setWidth(82)
+        
+        closeButton.setHeight(44)
+        closeButton.setWidth(80)
     }
     
     private func setupBadge() {
