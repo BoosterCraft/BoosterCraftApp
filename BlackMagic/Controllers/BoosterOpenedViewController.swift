@@ -5,23 +5,11 @@ final class BoosterOpenedViewController: UIViewController {
     // MARK: - Properties
 
     private let totalLabel = UILabel()
-
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 111, height: 155)
-        layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 14
-
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .black
-        collectionView.clipsToBounds = false
-        collectionView.register(OpenBoosterCardCell.self, forCellWithReuseIdentifier: OpenBoosterCardCell.identifier)
-        return collectionView
-    }()
+    private var collectionView: UICollectionView!
 
     private let bottomBarBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(white: 0.15, alpha: 1) // Dark consistent background color
+        view.backgroundColor = UIColor(white: 0.15, alpha: 1)
         return view
     }()
 
@@ -55,7 +43,7 @@ final class BoosterOpenedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        isModalInPresentation = true // ⛔ Prevent swipe-to-dismiss gesture
+        isModalInPresentation = true
         setupUI()
     }
 
@@ -64,10 +52,20 @@ final class BoosterOpenedViewController: UIViewController {
         updateStatsLabel()
     }
 
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
     // MARK: - Setup UI
 
     private func setupUI() {
-        // 🔠 Header label
+        setupTotalLabel()
+        setupCollectionView()
+        setupBottomBar()
+    }
+
+    private func setupTotalLabel() {
         totalLabel.textColor = .white
         totalLabel.font = .boldSystemFont(ofSize: 16)
         totalLabel.textAlignment = .center
@@ -76,39 +74,58 @@ final class BoosterOpenedViewController: UIViewController {
         totalLabel.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 8)
         totalLabel.pinLeft(to: view, 16)
         totalLabel.pinRight(to: view, 16)
+    }
 
-        // 🔳 Collection View
-        view.addSubview(collectionView)
+    private func setupCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        let itemsPerRow: CGFloat = 3
+        let spacing: CGFloat = 14
+        let inset: CGFloat = 16
+
+        let totalSpacing = spacing * (itemsPerRow - 1)
+        let availableWidth = view.bounds.width - (inset * 2) - totalSpacing
+        let itemWidth = floor(availableWidth / itemsPerRow)
+        let itemHeight = itemWidth * 1.4
+
+        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .black
+        collectionView.clipsToBounds = false
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.register(OpenBoosterCardCell.self, forCellWithReuseIdentifier: OpenBoosterCardCell.identifier)
 
+        view.addSubview(collectionView)
         collectionView.pinTop(to: totalLabel.bottomAnchor, 8)
-        collectionView.pinLeft(to: view, 16)
-        collectionView.pinRight(to: view, 16)
-        collectionView.pinBottom(to: view, 98) // Leaves space for buttons and bottom bar
+        collectionView.pinLeft(to: view, inset)
+        collectionView.pinRight(to: view, inset)
+        collectionView.pinBottom(to: view, 98)
+    }
 
+    private func setupBottomBar() {
         view.addSubview(bottomBarBackgroundView)
         bottomBarBackgroundView.pinLeft(to: view)
         bottomBarBackgroundView.pinRight(to: view)
         bottomBarBackgroundView.pinBottom(to: view)
-        bottomBarBackgroundView.setHeight(105) // 50 (button) + 24 (bottom padding) + 32 visual
+        bottomBarBackgroundView.setHeight(105)
 
-        // ➕ Stack View with spacing inside background
         buttonsStackView.addArrangedSubview(sellAllButton)
         buttonsStackView.addArrangedSubview(sellSelectedButton)
         buttonsStackView.addArrangedSubview(keepAllButton)
-
         bottomBarBackgroundView.addSubview(buttonsStackView)
-        buttonsStackView.pinLeft(to: bottomBarBackgroundView, 24)   // more horizontal padding
+
+        buttonsStackView.pinLeft(to: bottomBarBackgroundView, 24)
         buttonsStackView.pinRight(to: bottomBarBackgroundView, 24)
-        buttonsStackView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, 13) // more bottom gap
+        buttonsStackView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, 13)
         buttonsStackView.setHeight(40)
 
-        // 🎯 Button Action
         keepAllButton.addTarget(self, action: #selector(handleKeepAllTapped), for: .touchUpInside)
     }
 
-    // MARK: - Utility
+    // MARK: - Utilities
 
     private func updateStatsLabel() {
         let totalCards = boosterData.count
@@ -145,7 +162,12 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
         ) as! OpenBoosterCardCell
 
         let booster = boosterData[indexPath.item]
-        cell.cardView.configure(set: booster.set, type: booster.type, count: booster.count, color: booster.color)
+        cell.cardView.configure(
+            set: booster.set,
+            type: booster.type,
+            count: booster.count,
+            color: booster.color
+        )
         return cell
     }
 
