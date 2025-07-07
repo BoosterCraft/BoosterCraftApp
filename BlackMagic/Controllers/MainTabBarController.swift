@@ -41,7 +41,8 @@ class MainTabBarController: UITabBarController {
     private func setupTabs() {
         let mainVC = MainViewController()
         let boostersVC = OpenBoostersViewController()
-        let collectionVC = MyCollectionViewController()
+//        let collectionVC = MyCollectionViewController()
+        let collectionVC = UIViewController()
         
         mainVC.tabBarItem = UITabBarItem(title: "Buy boosters", image: UIImage(systemName: "cart.fill"), tag: 0)
         boostersVC.tabBarItem = UITabBarItem(title: "Open boosters", image: UIImage(systemName: "gift.fill"), tag: 1)
