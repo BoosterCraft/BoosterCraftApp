@@ -77,10 +77,20 @@ final class OpenBoostersViewController: UIViewController {
 
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 111, height: 155)
-        layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 14
         
+        let numberOfItemsPerRow: CGFloat = 3
+        let spacing: CGFloat = 14
+        let sideInset: CGFloat = 16
+
+        let totalSpacing = spacing * (numberOfItemsPerRow - 1)
+        let availableWidth = view.bounds.width - (sideInset * 2) - totalSpacing
+        let cellWidth = floor(availableWidth / numberOfItemsPerRow)
+        let cellHeight = cellWidth * 1.4 // Adjust ratio for visual appeal
+        
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .black
         collectionView.clipsToBounds = false
@@ -91,8 +101,8 @@ final class OpenBoostersViewController: UIViewController {
         view.addSubview(collectionView)
 
         collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        collectionView.pinLeft(to: view, 16)
-        collectionView.pinRight(to: view, 16)
+        collectionView.pinLeft(to: view, sideInset)
+        collectionView.pinRight(to: view, sideInset)
         collectionView.pinBottom(to: view)
     }
     private func presentBoosterOpenedViewController() {
