@@ -109,6 +109,7 @@ final class OpenBoosterCardView: UIView {
 //        closeButton.backgroundColor = UIColor(white: 0.2, alpha: 1)
         closeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         closeButton.layer.cornerRadius = 14
+        closeButton.addTarget(self, action: #selector(flipCard), for: .touchUpInside)
         
 //        backView.addSubview(backTextLabel)
         backStackView.axis = .vertical
