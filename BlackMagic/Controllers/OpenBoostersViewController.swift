@@ -25,19 +25,9 @@ final class OpenBoostersViewController: UITableViewController {
         let accessoryView = balanceButton
         accessoryView.frame.size = CGSize(width: 50, height: 34)
         
-        #if DEBUG
-        navigationItem.perform(Selector(("_setLargeTitleAccessoryView:")), with: accessoryView)
-        #else
-        let parts = [95, 115, 101, 116, 76, 97, 114, 103, 101, 84, 105, 116, 108, 101, 65, 99, 99, 101, 115, 115, 111, 114, 121, 86, 105, 101, 119, 58]
-        let selectorString = String(bytes: parts, encoding: .utf8)!
-        let selector = NSSelectorFromString(selectorString)
-        navigationItem.perform(selector, with: accessoryView)
-        #endif
-        tableView = UITableView(frame: .zero, style: .insetGrouped)
-    }
-    private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        navigationItem.setLargeTitleAccessoryView(with: accessoryView)
         title = "Open boosters"
         if let navigationBar = navigationController?.navigationBar {
             let appearance = UINavigationBarAppearance()
