@@ -33,8 +33,7 @@ class OBWelcomeController {
         let implementation = welcomeController.method(for: selector)
         let method = unsafeBitCast(implementation, to: initWithTitleDetailTextSymbolName.self)
         
-        let title: NSString = "OnBoardingKit"
-        let detailText: NSString = "A demo of how to use OnBoardingKit."
+
         viewController = method(welcomeController, selector, title, detailText, nil)
     }
     
