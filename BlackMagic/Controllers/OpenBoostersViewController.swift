@@ -1,5 +1,6 @@
 import UIKit
 
+
 final class OpenBoostersViewController: UIViewController {
 
     private let balanceButton: UIButton = {
