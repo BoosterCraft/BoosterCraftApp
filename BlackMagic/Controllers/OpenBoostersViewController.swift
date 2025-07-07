@@ -21,7 +21,7 @@ final class OpenBoostersViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        view.backgroundColor = .black
         let accessoryView = balanceButton
         accessoryView.frame.size = CGSize(width: 50, height: 34)
         
