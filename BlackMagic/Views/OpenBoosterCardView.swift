@@ -2,31 +2,59 @@ import UIKit
 
 final class OpenBoosterCardView: UIView {
 
+    // MARK: - Views
+
+    private let frontView = UIView()
+    private let backView = UIView()
+
+    // Front side elements
     private let setLabel = UILabel()
     private let typeLabel = UILabel()
     private let boosterLabel = UILabel()
     private let countCircle = UILabel()
+
+    // Back side elements
+    private let backTextLabel = UILabel()
+
+    // MARK: - State
+
+    private var isFrontVisible = true
 
     // MARK: - Init
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
-        backgroundColor = UIColor(white: 0.15, alpha: 1)
+        clipsToBounds = true
 
-        setupSubviews()
-        setupLayout()
+        setupFront()
+        setupBack()
+
+        addSubview(frontView)
+        addSubview(backView)
+
+        frontView.pin(to: self)
+        backView.pin(to: self)
+
+        backView.isHidden = true
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(flipCard))
+        addGestureRecognizer(tap)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Configure View
+    // MARK: - Setup Views
 
-    private func setupSubviews() {
+    private func setupFront() {
+        frontView.backgroundColor = UIColor(white: 0.15, alpha: 1)
+        frontView.layer.cornerRadius = 16
+        frontView.clipsToBounds = true
+
         [setLabel, typeLabel, boosterLabel, countCircle].forEach {
-            addSubview($0)
+            frontView.addSubview($0)
         }
 
         setLabel.font = UIFont.boldSystemFont(ofSize: 14)
@@ -50,26 +78,38 @@ final class OpenBoosterCardView: UIView {
         countCircle.backgroundColor = .systemBlue
         countCircle.layer.cornerRadius = 16
         countCircle.clipsToBounds = true
-    }
 
-    private func setupLayout() {
-        setLabel.pinTop(to: self, 8)
-        setLabel.pinLeft(to: self, 8)
-        setLabel.pinRight(to: self, 8)
+        setLabel.pinTop(to: frontView, 8)
+        setLabel.pinLeft(to: frontView, 8)
+        setLabel.pinRight(to: frontView, 8)
         setLabel.setHeight(24)
 
         typeLabel.pinTop(to: setLabel.bottomAnchor, 16)
-        typeLabel.pinLeft(to: self, 8)
-        typeLabel.pinRight(to: self, 8)
+        typeLabel.pinLeft(to: frontView, 8)
+        typeLabel.pinRight(to: frontView, 8)
 
         boosterLabel.pinTop(to: typeLabel.bottomAnchor, 4)
-        boosterLabel.pinLeft(to: self, 8)
-        boosterLabel.pinRight(to: self, 8)
+        boosterLabel.pinLeft(to: frontView, 8)
+        boosterLabel.pinRight(to: frontView, 8)
 
-        countCircle.pinBottom(to: self, 12)
-        countCircle.pinCenterX(to: self)
+        countCircle.pinBottom(to: frontView, 12)
+        countCircle.pinCenterX(to: frontView)
         countCircle.setWidth(32)
         countCircle.setHeight(32)
+    }
+
+    private func setupBack() {
+        backView.backgroundColor = UIColor(white: 0.15, alpha: 1)
+        backView.layer.cornerRadius = 16
+        backView.clipsToBounds = true
+
+        backTextLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        backTextLabel.textColor = .white
+        backTextLabel.numberOfLines = 0
+        backTextLabel.textAlignment = .center
+        backTextLabel.text = "Back side.\nTap to flip."
+        backView.addSubview(backTextLabel)
+        backTextLabel.pinCenter(to: backView)
     }
 
     // MARK: - Public Configuration
@@ -80,5 +120,20 @@ final class OpenBoosterCardView: UIView {
         typeLabel.text = type
         boosterLabel.text = "booster"
         countCircle.text = "\(count)"
+    }
+
+    // MARK: - Actions
+
+    @objc private func flipCard() {
+        let fromView = isFrontVisible ? frontView : backView
+        let toView = isFrontVisible ? backView : frontView
+
+        UIView.transition(from: fromView,
+                          to: toView,
+                          duration: 0.5,
+                          options: [.transitionFlipFromRight, .showHideTransitionViews],
+                          completion: nil)
+
+        isFrontVisible.toggle()
     }
 }

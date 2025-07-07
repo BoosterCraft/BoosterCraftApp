@@ -21,7 +21,20 @@ final class OpenBoostersViewController: UIViewController {
         Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
         Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
         Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed)
+        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
+        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
+        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
+        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
+        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
+        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
+        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
+        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
+        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
+
     ]
 
     override func viewDidLoad() {
