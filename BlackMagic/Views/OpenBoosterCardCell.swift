@@ -4,7 +4,11 @@ final class OpenBoosterCardCell: UICollectionViewCell {
     static let identifier = "OpenBoosterCardCell"
 
     let cardView = OpenBoosterCardView()
-
+    var onOpenTapped: (() -> Void)? {
+           didSet {
+               cardView.onOpenTapped = onOpenTapped
+           }
+       }
     override init(frame: CGRect) {
         super.init(frame: frame)
         clipsToBounds = false

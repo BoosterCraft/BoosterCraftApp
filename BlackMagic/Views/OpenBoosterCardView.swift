@@ -11,6 +11,7 @@ final class OpenBoosterCardView: UIView {
     
     private let badgeLabel = UILabel()  // badge moved to self
     
+    var onOpenTapped: (() -> Void)?
 //    private let backTextLabel = UILabel()
     private let openButton = UIButton()
     private let closeButton = UIButton()
@@ -103,6 +104,7 @@ final class OpenBoosterCardView: UIView {
         openButton.backgroundColor = UIColor(named: "openColor") ?? .systemBlue
         openButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         openButton.layer.cornerRadius = 14
+        openButton.addTarget(self, action: #selector(handleOpenTap), for: .touchUpInside)
         
         closeButton.setTitle("Close", for: .normal)
         closeButton.setTitleColor(.systemGray, for: .normal)
@@ -187,6 +189,9 @@ final class OpenBoosterCardView: UIView {
                           completion: nil)
         
         isFrontVisible.toggle()
+    }
+    @objc private func handleOpenTap() {
+        onOpenTapped?()
     }
 }
 

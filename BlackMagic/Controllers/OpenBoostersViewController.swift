@@ -95,6 +95,12 @@ final class OpenBoostersViewController: UIViewController {
         collectionView.pinRight(to: view, 16)
         collectionView.pinBottom(to: view)
     }
+    private func presentBoosterOpenedViewController() {
+        let openedVC = BoosterOpenedViewController()
+        let nav = UINavigationController(rootViewController: openedVC)
+        nav.modalPresentationStyle = .automatic
+        present(nav, animated: true)
+    }
 }
 
 // MARK: - UICollectionViewDataSource & Delegate
@@ -108,6 +114,10 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OpenBoosterCardCell.identifier, for: indexPath) as! OpenBoosterCardCell
         let booster = boosterData[indexPath.item]
         cell.cardView.configure(set: booster.set, type: booster.type, count: booster.count, color: booster.color)
+        cell.onOpenTapped = { [weak self] in
+                self?.presentBoosterOpenedViewController()
+            }
+
         return cell
     }
 
