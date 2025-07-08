@@ -23,7 +23,7 @@ class MainTabBarController: UITabBarController {
 //            return
 //        }
         let title: NSString = "Welcome to Black Magic"
-        let detailText: NSString = "An example of how to use OnBoardingKit."
+        let detailText: NSString = ""
         let welcomeController = OBWelcomeController(title: title, detailText: detailText, symbolName: nil)
         welcomeController.addBulletedListItem(title: "MTG boosters here", description: "Virtual versions of Magic: the Gathering packs available", symbolName: "sparkles.rectangle.stack")
         welcomeController.addBulletedListItem(title: "Buy and open packs for free", description: "Get virtual currency every day.", symbolName: "infinity")
