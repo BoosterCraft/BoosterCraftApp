@@ -28,11 +28,15 @@ final class OpenBoostersViewController: UIViewController {
         UserBooster(setCode: "XYZ", type: .play, color: .systemRed)
     ]
 
+    // Группируем бустеры по (setCode, type) и считаем количество
+    private var groupedBoosters: [(booster: UserBooster, count: Int)] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupNavigationBar()
         setupCollectionView()
+        groupBoostersForDisplay()
     }
 
     private func setupNavigationBar() {
@@ -95,6 +99,21 @@ final class OpenBoostersViewController: UIViewController {
         collectionView.pinRight(to: view, sideInset)
         collectionView.pinBottom(to: view)
     }
+
+    private func groupBoostersForDisplay() {
+        let boosters = boosterData
+        var grouped: [BoosterKey: (booster: UserBooster, count: Int)] = [:]
+        for booster in boosters {
+            let key = BoosterKey(setCode: booster.setCode, type: booster.type)
+            if let existing = grouped[key] {
+                grouped[key] = (booster: existing.booster, count: existing.count + 1)
+            } else {
+                grouped[key] = (booster: booster, count: 1)
+            }
+        }
+        groupedBoosters = Array(grouped.values)
+    }
+
     private func presentBoosterOpenedViewController() {
         let openedVC = BoosterOpenedViewController()
         let nav = UINavigationController(rootViewController: openedVC)
@@ -107,22 +126,21 @@ final class OpenBoostersViewController: UIViewController {
 
 extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return boosterData.count
+        return groupedBoosters.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OpenBoosterCardCell.identifier, for: indexPath) as! OpenBoosterCardCell
-        let booster = boosterData[indexPath.item]
+        let (booster, count) = groupedBoosters[indexPath.item]
         cell.cardView.configure(
             set: booster.setCode,
             type: booster.type.rawValue,
-            count: 1,
+            count: count,
             color: UIColor.fromHexString(booster.colorHex ?? "") ?? .systemBlue
         )
         cell.onOpenTapped = { [weak self] in
-                self?.presentBoosterOpenedViewController()
-            }
-
+            self?.presentBoosterOpenedViewController()
+        }
         return cell
     }
 

@@ -59,3 +59,21 @@ extension UIColor {
 struct UserBoosters: Codable {
     var boosters: [UserBooster]
 }
+
+extension UserBoosters {
+    // Группировка бустеров по (setCode, type) с подсчетом количества
+    func groupedCounts() -> [BoosterKey: Int] {
+        var dict: [BoosterKey: Int] = [:]
+        for booster in boosters {
+            let key = BoosterKey(setCode: booster.setCode, type: booster.type)
+            dict[key, default: 0] += 1
+        }
+        return dict
+    }
+}
+
+// Ключ для группировки бустеров (сет + тип)
+struct BoosterKey: Hashable, Codable {
+    let setCode: String
+    let type: UserBooster.BoosterType
+}
