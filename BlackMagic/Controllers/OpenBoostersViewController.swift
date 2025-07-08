@@ -3,16 +3,7 @@ import UIKit
 
 final class OpenBoostersViewController: UIViewController {
 
-    private let balanceButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("$47.92", for: .normal)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        button.setImage(UIImage(systemName: "creditcard.fill"), for: .normal)
-        button.tintColor = .systemBlue
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0)
-        return button
-    }()
+    private let balanceButton = BalanceButton()
 
     private var collectionView: UICollectionView!
 
