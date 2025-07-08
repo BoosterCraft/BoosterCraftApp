@@ -24,7 +24,7 @@ class MainTabBarController: UITabBarController {
         let detailText: NSString = ""
         let welcomeController = OBWelcomeController(title: title, detailText: detailText, symbolName: nil)
         welcomeController.addBulletedListItem(title: "MTG boosters here", description: "Virtual versions of Magic: the Gathering packs available", symbolName: "sparkles.rectangle.stack")
-        welcomeController.addBulletedListItem(title: "Buy and open packs for free", description: "Get virtual currency every day.", symbolName: "infinity")
+        welcomeController.addBulletedListItem(title: "Buy and open packs for free", description: "Get virtual currency every day", symbolName: "infinity")
         welcomeController.addBulletedListItem(title: "Sell and trade your cards", description: "Exchange them for currency or make deals with players", symbolName: "arrow.left.arrow.right")
         
         welcomeController.addBoldButton(title: "Get Started") { self.dismiss(animated: true) }
