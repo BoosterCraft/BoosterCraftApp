@@ -152,7 +152,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
             ),
             (
                 title: "AETHERDRIFT".uppercased(),
-                description: "Leave your competition in the dust! Get behind the wheel in a multiversal race filled with adrenaline-fueled gameplay.",
+                description: "Leave your competition in the dust! Get behind the wheel in a multiversal race filled with adrenaline-fueled gameplay.",
                 imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/AETHERDRIFT.png") ,
                 titleColor: UIColor(red: 28, green: 28, blue: 28),
                 titleBackgroundColor: UIColor(red: 253, green: 185, blue: 1),
@@ -196,6 +196,28 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
             ),
         ]
         
+        // Получаем 5 последних сетов-экспансий из Scryfall
+        ScryfallServiceManager.shared.fetchLatestExpansions { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let sets):
+                    // Обновляем только BoosterBackData для каждой карточки
+                    for (i, set) in sets.prefix(self?.boosterCardsData.count ?? 0).enumerated() {
+                        // Формируем новые данные для обратной стороны
+                        let newBack = BoosterBackData(
+                            title: set.name,
+                            details: "Код: \(set.code)\nТип: \(set.set_type)\nКарт: \(set.card_count)\nДата релиза: \(set.released_at)",
+                            price: "—"
+                        )
+                        // Обновляем только backData, остальное не трогаем
+                        self?.boosterCardsData[i].backData = newBack
+                    }
+                    self?.boosterCollectionView.reloadData()
+                case .failure(let error):
+                    print("Ошибка при получении сетов: \(error)")
+                }
+            }
+        }
         pageControl.numberOfPages = boosterCardsData.count
         boosterCollectionView.reloadData()
     }
