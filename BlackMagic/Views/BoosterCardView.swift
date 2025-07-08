@@ -23,17 +23,18 @@ class BoosterCardView: UIView {
 
     // MARK: - Init
     
-    init(image: UIImage?,
+    init(imageURL: URL?,
          title: String,
          description: String,
          titleColor: UIColor,
          titleBackgroundColor: UIColor,
          buttonTextColor: UIColor,
+         titleFontSize: Int,
          backData: BoosterBackData)
     {
         super.init(frame: .zero)
         setupViews()
-        setupFront(image: image, title: title, description: description, titleColor: titleColor, titleBackgroundColor: titleBackgroundColor, buttonTextColor: buttonTextColor)
+        setupFront(imageURL: imageURL, title: title, description: description, titleColor: titleColor, titleBackgroundColor: titleBackgroundColor, buttonTextColor: buttonTextColor, titleFontSize: titleFontSize)
         setupBack(with: backData)
         showFront()
     }
@@ -70,12 +71,16 @@ class BoosterCardView: UIView {
         backView.pin(to: containerView)
     }
 
-    private func setupFront(image: UIImage?, title: String, description: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor) {
-        imageView.image = image
+    private func setupFront(imageURL: URL?, title: String, description: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, titleFontSize: Int) {
+        
+        UIImage.loadFromURL(imageURL) { img in
+            self.imageView.image = img
+        }
+    
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
 
-        titleLabel.font = UIFont(name: "Bungee-Regular", size: 18)
+        titleLabel.font = UIFont(name: "Bungee-Regular", size: CGFloat(titleFontSize))
         titleLabel.textColor = titleColor
         titleLabel.backgroundColor = titleBackgroundColor
         titleLabel.textAlignment = .center
@@ -208,5 +213,48 @@ class BoosterCardView: UIView {
     
     @objc private func stepperChanged() {
         quantityLabel.text = "\(Int(quantityStepper.value))"
+    }
+}
+extension UIImage {
+    
+    /// Loads an image from a given URL asynchronously.
+    /// If loading fails, it returns a solid gray placeholder.
+    /// - Parameters:
+    ///   - url: Optional URL to load the image from.
+    ///   - completion: A closure returning the loaded or placeholder image.
+    static func loadFromURL(_ url: URL?, completion: @escaping (UIImage) -> Void) {
+        
+        // Check for nil URL
+        guard let url = url else {
+            print("❌ loadFromURL: URL is nil. Returning gray placeholder.")
+            completion(UIImage.grayPlaceholder())
+            return
+        }
+
+        // Try loading the data
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let data = data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            } else {
+                print("❌ loadFromURL: Failed to load image. URL = \(url.absoluteString)")
+                if let err = error {
+                    print("Error: \(err.localizedDescription)")
+                }
+                DispatchQueue.main.async {
+                    completion(UIImage.grayPlaceholder())
+                }
+            }
+        }.resume()
+    }
+
+    /// Creates a solid gray placeholder image
+    private static func grayPlaceholder(size: CGSize = CGSize(width: 100, height: 100)) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            UIColor.lightGray.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+        }
     }
 }

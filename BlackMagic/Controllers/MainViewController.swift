@@ -4,7 +4,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     
     // MARK: - Properties
     
-    private var boosterCardsData: [(title: String, description: String, imageName: String, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, backData: BoosterBackData)] = []
+    private var boosterCardsData: [(title: String, description: String, imageURL: URL?, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, titleFontSize: Int, backData: BoosterBackData)] = []
     
     private var currentPage = 0 {
         didSet {
@@ -102,31 +102,77 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     private func setupCardData() {
         boosterCardsData = [
             (
-                title: "TARKIR: DRAGONSTORM",
-                description: "Cinematic action, dynamic clan gameplay, and powerful new dragons.",
-                imageName: "cardImage",
-                titleColor: UIColor(red: 34, green: 45, blue: 87),
-                titleBackgroundColor: UIColor(red: 219, green: 240, blue: 252),
-                buttonTextColor: UIColor(red: 34, green: 45, blue: 87),
+                title: "Final Fantasy".uppercased(),
+                description: "Cast powerful spells, call upon classic summons, and even visit your favorite locations on the back of a chocobo.",
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/Final_Fantasy.png") ,
+                titleColor: UIColor(red: 28, green: 28, blue: 28),
+                titleBackgroundColor: UIColor(red: 255, green: 255, blue: 255),
+                buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
+                titleFontSize: 20,
                 BoosterBackData(
                     title: "TDM booster",
                     details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$26.28"
+                    price: "$6.51"
                 )
             ),
             (
-                title: "OUTLAWS OF THUNDER JUCTION",
-                description: "Dark gothic horror, werewolves, and vampires — lead your clan to power.",
-                imageName: "cardImage",
-                titleColor: UIColor(red: 255, green: 255, blue: 255),
-                titleBackgroundColor: UIColor(red: 236, green: 90, blue: 43),
-                buttonTextColor: UIColor(red: 236, green: 90, blue: 43),
+                title: "Tarkir: dragonstorm".uppercased(),
+                description: "Cinematic action, dynamic clan gameplay, and powerful new dragons that add lasting firepower to your collection.",
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/Tarkir_dragonstorm.png") ,
+                titleColor: UIColor(red: 28, green: 28, blue: 28),
+                titleBackgroundColor: UIColor(red: 219, green: 240, blue: 252),
+                buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
+                titleFontSize: 20,
                 BoosterBackData(
-                    title: "Moonrise Pack",
-                    details: "• 3 Rare\n• 4 Uncommon\n• 7 Common\n• 1 Token card",
-                    price: "$19.80"
+                    title: "TDM booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
+                    price: "$6.51"
                 )
-            )
+            ),
+            (
+                title: "AETHERDRIFT".uppercased(),
+                description: "Leave your competition in the dust! Get behind the wheel in a multiversal race filled with adrenaline-fueled gameplay.",
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/AETHERDRIFT.png") ,
+                titleColor: UIColor(red: 28, green: 28, blue: 28),
+                titleBackgroundColor: UIColor(red: 253, green: 185, blue: 1),
+                buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
+                titleFontSize: 20,
+                BoosterBackData(
+                    title: "TDM booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
+                    price: "$6.51"
+                )
+            ),
+            (
+                title: "Duskmourn: house of horror".uppercased(),
+                description: "Enter Duskmourn... if you dare. Set the scene for your opponent's greatest fears to come to life as shadows turn lethal.",
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/Duskmourn_house_of_horror.jpg") ,
+                titleColor: UIColor(red: 28, green: 28, blue: 28),
+                titleBackgroundColor: UIColor(red: 157, green: 203, blue: 185),
+                buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
+                titleFontSize: 14,
+                BoosterBackData(
+                    title: "TDM booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
+                    price: "$6.51"
+                )
+            ),
+           
+            (
+                
+                title: "bloomburrow".uppercased(),
+                description: "Venture to a tiny idyllic land, and gather your friends in a woodland party, take to the battlefield and defend your folk!",
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/bloomburrow.png") ,
+                titleColor: UIColor(red: 255, green: 255, blue: 255),
+                titleBackgroundColor: UIColor(red: 10, green: 107, blue: 61),
+                buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
+                titleFontSize: 20,
+                BoosterBackData(
+                    title: "TDM booster",
+                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
+                    price: "$6.51"
+                )
+            ),
         ]
         
         pageControl.numberOfPages = boosterCardsData.count
@@ -171,12 +217,13 @@ extension MainViewController: UICollectionViewDataSource {
         
         let data = boosterCardsData[indexPath.item]
         let cardView = BoosterCardView(
-            image: UIImage(named: data.imageName),
+            imageURL: data.imageURL,
             title: data.title,
             description: data.description,
             titleColor: data.titleColor,
             titleBackgroundColor: data.titleBackgroundColor,
             buttonTextColor: data.buttonTextColor,
+            titleFontSize: data.titleFontSize,
             backData: data.backData
         )
         cell.configure(with: cardView)
