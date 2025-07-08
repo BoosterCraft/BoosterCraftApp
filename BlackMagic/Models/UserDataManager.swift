@@ -8,6 +8,7 @@ class UserDataManager {
     // Ключи для UserDefaults
     private let collectionKey = "user_card_collection"
     private let balanceKey = "user_balance"
+    private let boostersKey = "user_unopened_boosters"
     
     // Сохранить коллекцию пользователя
     func saveCollection(_ collection: UserCollection) {
@@ -41,5 +42,22 @@ class UserDataManager {
         }
         // Если данных нет, возвращаем баланс по умолчанию (например, 0)
         return UserBalance(coins: 0)
+    }
+    
+    // Сохранить неоткрытые бустеры пользователя
+    func saveUnopenedBoosters(_ boosters: UserBoosters) {
+        if let data = try? JSONEncoder().encode(boosters) {
+            UserDefaults.standard.set(data, forKey: boostersKey)
+        }
+    }
+    
+    // Загрузить неоткрытые бустеры пользователя
+    func loadUnopenedBoosters() -> UserBoosters {
+        if let data = UserDefaults.standard.data(forKey: boostersKey),
+           let boosters = try? JSONDecoder().decode(UserBoosters.self, from: data) {
+            return boosters
+        }
+        // Если данных нет, возвращаем пустой массив
+        return UserBoosters(boosters: [])
     }
 } 

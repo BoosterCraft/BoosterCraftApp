@@ -25,17 +25,17 @@ final class BoosterOpenedViewController: UIViewController {
     private let sellSelectedButton = BoosterOpenedViewController.makeButton(title: "Sell selected", bgColor: .systemGray)
     private let keepAllButton = BoosterOpenedViewController.makeButton(title: "Keep all", bgColor: .systemBlue)
 
-    private var boosterData: [Booster] = [
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "OTJ", type: "Collector", count: 1, color: .systemOrange),
-        Booster(set: "WOE", type: "Draft", count: 3, color: .purple),
-        Booster(set: "NEO", type: "SET", count: 2, color: .systemPink),
-        Booster(set: "ABC", type: "Play", count: 4, color: .systemGreen),
-        Booster(set: "XYZ", type: "Draft", count: 5, color: .systemRed),
-        Booster(set: "TDM", type: "Play", count: 2, color: .systemTeal),
-        Booster(set: "WOE", type: "Draft", count: 2, color: .purple),
-        Booster(set: "XYZ", type: "Draft", count: 3, color: .systemRed),
-        Booster(set: "NEO", type: "SET", count: 1, color: .systemPink)
+    private var boosterData: [UserBooster] = [
+        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
+        UserBooster(setCode: "OTJ", type: .collector, color: .systemOrange),
+        UserBooster(setCode: "WOE", type: .play, color: .purple),
+        UserBooster(setCode: "NEO", type: .play, color: .systemPink),
+        UserBooster(setCode: "ABC", type: .play, color: .systemGreen),
+        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
+        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
+        UserBooster(setCode: "WOE", type: .play, color: .purple),
+        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
+        UserBooster(setCode: "NEO", type: .play, color: .systemPink)
     ]
 
     // MARK: - Lifecycle
@@ -163,10 +163,10 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
 
         let booster = boosterData[indexPath.item]
         cell.cardView.configure(
-            set: booster.set,
-            type: booster.type,
-            count: booster.count,
-            color: booster.color
+            set: booster.setCode,
+            type: booster.type.rawValue,
+            count: 1,
+            color: UIColor.fromHexString(booster.colorHex ?? "") ?? .systemBlue
         )
         return cell
     }
