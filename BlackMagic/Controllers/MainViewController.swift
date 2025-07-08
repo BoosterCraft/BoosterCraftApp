@@ -17,7 +17,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Black magic"
-        label.font = UIFont(name: "PirataOne-Regular", size: 34)
+        label.font = UIFont(name: "PirataOne-Regular", size: 40)
         label.textColor = .white
         label.textAlignment = .center
         return label
