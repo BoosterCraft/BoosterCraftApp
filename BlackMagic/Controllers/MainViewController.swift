@@ -64,6 +64,10 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        // Для теста: устанавливаем баланс пользователя в 500 монет
+        let testBalance = UserBalance(coins: 500)
+        UserDataManager.shared.saveBalance(testBalance)
+        balanceButton.updateBalance()
         setupLayout()
         setupCardData()
         setupPageControl()
@@ -260,6 +264,48 @@ extension MainViewController: UICollectionViewDataSource {
             titleFontSize: data.titleFontSize,
             backData: data.backData
         )
+        // Устанавливаем код сета для покупки
+        cardView.configurePurchase(setCode: data.backData.title)
+        // Обработка покупки
+        cardView.onBuyTapped = { [weak self] purchaseInfo in
+            guard let self = self else { return }
+            let price = purchaseInfo.quantity * 50
+            var balance = UserDataManager.shared.loadBalance()
+            if balance.coins >= price {
+                // Достаточно средств
+                balance.coins -= price
+                UserDataManager.shared.saveBalance(balance)
+                self.balanceButton.updateBalance()
+                // Сохраняем купленные бустеры
+                var userBoosters = UserDataManager.shared.loadUnopenedBoosters()
+                for _ in 0..<purchaseInfo.quantity {
+                    let newBooster = UserBooster(
+                        setCode: purchaseInfo.setCode,
+                        type: purchaseInfo.type,
+                        color: purchaseInfo.color
+                    )
+                    userBoosters.boosters.append(newBooster)
+                }
+                UserDataManager.shared.saveUnopenedBoosters(userBoosters)
+                // Логируем информацию о покупке
+                print("[Покупка] Куплено: сет=\(purchaseInfo.setCode), тип=\(purchaseInfo.type.rawValue), количество=\(purchaseInfo.quantity), новый баланс=\(balance.coins)")
+                // Логируем все бустеры пользователя
+                let allBoosters = UserDataManager.shared.loadUnopenedBoosters().boosters
+                print("[Бустеры пользователя] Всего: \(allBoosters.count)")
+                for booster in allBoosters {
+                    print("  - setCode: \(booster.setCode), type: \(booster.type.rawValue), color: \(booster.colorHex ?? "nil"), id: \(booster.id)")
+                }
+                // Показываем алерт об успешной покупке
+                let alert = UIAlertController(title: "Покупка успешна", message: "Вы купили \(purchaseInfo.quantity) бустер(ов)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+            } else {
+                // Недостаточно средств
+                let alert = UIAlertController(title: "Недостаточно средств", message: "Пополните баланс для покупки.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+            }
+        }
         cell.configure(with: cardView)
         return cell
     }

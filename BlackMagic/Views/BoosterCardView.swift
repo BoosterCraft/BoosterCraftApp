@@ -21,6 +21,11 @@ class BoosterCardView: UIView {
     
     private var isFrontVisible = true
 
+    // Колбэк для покупки бустера
+    var onBuyTapped: ((BoosterPurchaseInfo) -> Void)?
+    // Код сета для покупки (устанавливается при конфигурировании)
+    private var purchaseSetCode: String?
+
     // MARK: - Init
     
     init(imageURL: URL?,
@@ -146,11 +151,12 @@ class BoosterCardView: UIView {
         quantityLabel.text = "1"
         quantityLabel.textAlignment = .center
         
-        priceButton.setTitle("Buy for \(data.price)", for: .normal)
+        priceButton.setTitle("Buy for 50", for: .normal)
         priceButton.setTitleColor(.white, for: .normal)
         priceButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         priceButton.backgroundColor = .systemBlue
         priceButton.layer.cornerRadius = 14
+        priceButton.addTarget(self, action: #selector(handleBuyTapped), for: .touchUpInside)
         
         backView.addSubviews(backTitleLabel, segmentedControl, detailsLabel, quantityStepper, quantityLabel, priceButton)
         
@@ -213,8 +219,27 @@ class BoosterCardView: UIView {
     
     @objc private func stepperChanged() {
         quantityLabel.text = "\(Int(quantityStepper.value))"
+        // Обновляем цену на кнопке
+        let price = Int(quantityStepper.value) * 50
+        priceButton.setTitle("Buy for $\(price)", for: .normal)
+    }
+
+    // Метод для конфигурирования кода сета
+    func configurePurchase(setCode: String) {
+        self.purchaseSetCode = setCode
+    }
+
+    // Обработка нажатия на BUY
+    @objc private func handleBuyTapped() {
+        guard let setCode = purchaseSetCode else { return }
+        let type: UserBooster.BoosterType = segmentedControl.selectedSegmentIndex == 0 ? .play : .collector
+        let quantity = Int(quantityStepper.value)
+        let color = backTitleLabel.backgroundColor // Можно заменить на нужный цвет
+        let info = BoosterPurchaseInfo(setCode: setCode, type: type, quantity: quantity, color: color)
+        onBuyTapped?(info)
     }
 }
+
 extension UIImage {
     
     /// Общий in-memory кэш изображений
@@ -266,6 +291,14 @@ extension UIImage {
             context.fill(CGRect(origin: .zero, size: size))
         }
     }
+}
+
+// Информация о покупке бустера
+struct BoosterPurchaseInfo {
+    let setCode: String
+    let type: UserBooster.BoosterType
+    let quantity: Int
+    let color: UIColor?
 }
 
 
