@@ -39,6 +39,12 @@ final class MyCollectionViewController: UIViewController {
         setupNavigationBar()
         setupCollectionView()
     }
+    
+    // MARK: Обновление баланса
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        balanceButton.updateBalance()
+    }
 
     private func setupNavigationBar() {
         balanceButton.frame.size = balanceButton.intrinsicContentSize

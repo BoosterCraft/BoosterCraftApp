@@ -23,6 +23,12 @@ final class OpenBoostersViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleBoosterPurchase), name: .didPurchaseBooster, object: nil)
     }
 
+    // MARK: Обновление баланса
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        balanceButton.updateBalance()
+    }
+    
     private func setupNavigationBar() {
         let accessoryView = balanceButton
         accessoryView.frame.size = CGSize(width: 50, height: 34)
@@ -128,7 +134,7 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return groupedBoosters.count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OpenBoosterCardCell.identifier, for: indexPath) as! OpenBoosterCardCell
         let (booster, count) = groupedBoosters[indexPath.item]
@@ -143,11 +149,8 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
         }
         return cell
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Selected booster: \(userBoosters[indexPath.item].type)")
     }
 }
-
-// MARK: - Data Model
-
