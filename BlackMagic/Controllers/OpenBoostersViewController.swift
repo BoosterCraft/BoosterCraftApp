@@ -7,26 +7,8 @@ final class OpenBoostersViewController: UIViewController {
 
     private var collectionView: UICollectionView!
 
-    private let boosterData: [UserBooster] = [
-        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
-        UserBooster(setCode: "OTJ", type: .collector, color: .systemOrange),
-        UserBooster(setCode: "WOE", type: .play, color: .purple),
-        UserBooster(setCode: "NEO", type: .play, color: .systemPink),
-        UserBooster(setCode: "ABC", type: .play, color: .systemGreen),
-        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
-        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
-        UserBooster(setCode: "OTJ", type: .collector, color: .systemOrange),
-        UserBooster(setCode: "WOE", type: .play, color: .purple),
-        UserBooster(setCode: "NEO", type: .play, color: .systemPink),
-        UserBooster(setCode: "ABC", type: .play, color: .systemGreen),
-        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
-        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
-        UserBooster(setCode: "OTJ", type: .collector, color: .systemOrange),
-        UserBooster(setCode: "WOE", type: .play, color: .purple),
-        UserBooster(setCode: "NEO", type: .play, color: .systemPink),
-        UserBooster(setCode: "ABC", type: .play, color: .systemGreen),
-        UserBooster(setCode: "XYZ", type: .play, color: .systemRed)
-    ]
+    // Массив всех неоткрытых бустеров пользователя (загружается из UserDefaults)
+    private var userBoosters: [UserBooster] = []
 
     // Группируем бустеры по (setCode, type) и считаем количество
     private var groupedBoosters: [(booster: UserBooster, count: Int)] = []
@@ -36,7 +18,9 @@ final class OpenBoostersViewController: UIViewController {
         view.backgroundColor = .black
         setupNavigationBar()
         setupCollectionView()
-        groupBoostersForDisplay()
+        reloadBoosters()
+        // Подписываемся на уведомление о покупке бустера
+        NotificationCenter.default.addObserver(self, selector: #selector(handleBoosterPurchase), name: .didPurchaseBooster, object: nil)
     }
 
     private func setupNavigationBar() {
@@ -100,8 +84,15 @@ final class OpenBoostersViewController: UIViewController {
         collectionView.pinBottom(to: view)
     }
 
+    // Загрузить бустеры пользователя и обновить UI
+    private func reloadBoosters() {
+        userBoosters = UserDataManager.shared.loadUnopenedBoosters().boosters
+        groupBoostersForDisplay()
+        collectionView.reloadData()
+    }
+
     private func groupBoostersForDisplay() {
-        let boosters = boosterData
+        let boosters = userBoosters
         var grouped: [BoosterKey: (booster: UserBooster, count: Int)] = [:]
         for booster in boosters {
             let key = BoosterKey(setCode: booster.setCode, type: booster.type)
@@ -119,6 +110,15 @@ final class OpenBoostersViewController: UIViewController {
         let nav = UINavigationController(rootViewController: openedVC)
         nav.modalPresentationStyle = .automatic
         present(nav, animated: true)
+    }
+
+    // Обработка уведомления о покупке бустера
+    @objc private func handleBoosterPurchase() {
+        reloadBoosters()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -145,7 +145,7 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Selected booster: \(boosterData[indexPath.item].type)")
+        print("Selected booster: \(userBoosters[indexPath.item].type)")
     }
 }
 

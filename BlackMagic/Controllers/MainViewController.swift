@@ -295,6 +295,8 @@ extension MainViewController: UICollectionViewDataSource {
                 for booster in allBoosters {
                     print("  - setCode: \(booster.setCode), type: \(booster.type.rawValue), color: \(booster.colorHex ?? "nil"), id: \(booster.id)")
                 }
+                // Уведомляем другие экраны о покупке бустера
+                NotificationCenter.default.post(name: .didPurchaseBooster, object: nil)
                 // Показываем алерт об успешной покупке
                 let alert = UIAlertController(title: "Покупка успешна", message: "Вы купили \(purchaseInfo.quantity) бустер(ов)", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -345,4 +347,8 @@ extension MainViewController: UIScrollViewDelegate {
             currentPage = page
         }
     }
+}
+
+extension Notification.Name {
+    static let didPurchaseBooster = Notification.Name("didPurchaseBooster")
 }
