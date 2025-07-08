@@ -19,9 +19,7 @@ class MainTabBarController: UITabBarController {
 
     private func showOnboardingIfNeeded() {
         // Проверяем, был ли онбординг уже пройден
-//        guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else {
-//            return
-//        }
+        
         let title: NSString = "Welcome to Black Magic"
         let detailText: NSString = ""
         let welcomeController = OBWelcomeController(title: title, detailText: detailText, symbolName: nil)
@@ -30,11 +28,16 @@ class MainTabBarController: UITabBarController {
         welcomeController.addBulletedListItem(title: "Sell and trade your cards", description: "Exchange them for currency or make deals with players", symbolName: "arrow.left.arrow.right")
         
         welcomeController.addBoldButton(title: "Get Started") { self.dismiss(animated: true) }
-        
-        present(welcomeController.viewController, animated: true)
+        guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else {
+            present(welcomeController.viewController, animated: true)
+        return
+            
+        }
+    }
+       
     
 
-    }
+    
     // MARK: - Setup Tabs
     
     private func setupTabs() {
