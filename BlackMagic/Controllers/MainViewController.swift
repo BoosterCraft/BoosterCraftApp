@@ -76,6 +76,27 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         setupLayout()
         setupCardData()
         setupPageControl()
+        // Test ScryfallServiceManager: Fetch a card by name and print result
+        ScryfallServiceManager.shared.fetchCard(named: "Black Lotus") { result in
+            switch result {
+            case .success(let card):
+                print("Fetched card: \(card)")
+            case .failure(let error):
+                print("Failed to fetch card: \(error)")
+            }
+        }
+        // Тест: Получить 5 последних сетов-экспансий и вывести их в консоль
+        ScryfallServiceManager.shared.fetchLatestExpansions { result in
+            switch result {
+            case .success(let sets):
+                print("Последние 5 сетов-экспансий:")
+                for set in sets {
+                    print(set)
+                }
+            case .failure(let error):
+                print("Ошибка при получении сетов: \(error)")
+            }
+        }
     }
     
     // MARK: - Layout
