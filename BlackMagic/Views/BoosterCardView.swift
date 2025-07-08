@@ -86,7 +86,7 @@ class BoosterCardView: UIView {
         titleLabel.textAlignment = .center
         titleLabel.text = title
         
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.textColor = .white
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0
