@@ -85,6 +85,18 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 print("Failed to fetch card: \(error)")
             }
         }
+        // Тест: Получить 5 последних сетов-экспансий и вывести их в консоль
+        ScryfallServiceManager.shared.fetchLatestExpansions { result in
+            switch result {
+            case .success(let sets):
+                print("Последние 5 сетов-экспансий:")
+                for set in sets {
+                    print(set)
+                }
+            case .failure(let error):
+                print("Ошибка при получении сетов: \(error)")
+            }
+        }
     }
     
     // MARK: - Layout
