@@ -207,7 +207,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                         let newBack = BoosterBackData(
                             title: set.name,
                             details: "Код: \(set.code)\nТип: \(set.set_type)\nКарт: \(set.card_count)\nДата релиза: \(set.released_at)",
-                            price: "—"
+                            price: "$50" // Устанавливаем дефолтную цену
                         )
                         // Обновляем только backData, остальное не трогаем
                         self?.boosterCardsData[i].backData = newBack
