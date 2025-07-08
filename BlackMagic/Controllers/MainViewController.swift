@@ -167,7 +167,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
             (
                 title: "Duskmourn: house of horror".uppercased(),
                 description: "Enter Duskmourn... if you dare. Set the scene for your opponent's greatest fears to come to life as shadows turn lethal.",
-                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/Duskmourn_house_of_horror.jpg") ,
+                imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/Duskmourn_house_of_horror.png") ,
                 titleColor: UIColor(red: 28, green: 28, blue: 28),
                 titleBackgroundColor: UIColor(red: 157, green: 203, blue: 185),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
