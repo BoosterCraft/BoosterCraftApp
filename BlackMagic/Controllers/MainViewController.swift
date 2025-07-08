@@ -76,6 +76,15 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         setupLayout()
         setupCardData()
         setupPageControl()
+        // Test ScryfallServiceManager: Fetch a card by name and print result
+        ScryfallServiceManager.shared.fetchCard(named: "Black Lotus") { result in
+            switch result {
+            case .success(let card):
+                print("Fetched card: \(card)")
+            case .failure(let error):
+                print("Failed to fetch card: \(error)")
+            }
+        }
     }
     
     // MARK: - Layout
