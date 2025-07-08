@@ -86,7 +86,7 @@ class BoosterCardView: UIView {
         titleLabel.textAlignment = .center
         titleLabel.text = title
         
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.textColor = .white
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0
@@ -217,39 +217,48 @@ class BoosterCardView: UIView {
 }
 extension UIImage {
     
-    /// Loads an image from a given URL asynchronously.
-    /// If loading fails, it returns a solid gray placeholder.
+    /// Общий in-memory кэш изображений
+    private static let imageCache = NSCache<NSURL, UIImage>()
+
+    /// Загружает картинку по URL с кешированием. При повторных вызовах загрузка не происходит.
     /// - Parameters:
-    ///   - url: Optional URL to load the image from.
-    ///   - completion: A closure returning the loaded or placeholder image.
+    ///   - url: Опциональный URL
+    ///   - completion: Вызывается с изображением (или серым placeholder'ом)
     static func loadFromURL(_ url: URL?, completion: @escaping (UIImage) -> Void) {
         
-        // Check for nil URL
+        // Проверка наличия URL
         guard let url = url else {
-            print("❌ loadFromURL: URL is nil. Returning gray placeholder.")
-            completion(UIImage.grayPlaceholder())
+            print("❌ loadFromURL: URL is nil. Возвращается placeholder.")
+            completion(grayPlaceholder())
             return
         }
-
-        // Try loading the data
+        
+        // Проверка наличия изображения в кеше
+        if let cached = imageCache.object(forKey: url as NSURL) {
+            print("✅ loadFromURL: Изображение найдено в кеше для \(url.absoluteString)")
+            completion(cached)
+            return
+        }
+        
+        // Если нет в кеше — загружаем
+        print("⬇️ loadFromURL: Загружаем изображение с сети: \(url.absoluteString)")
         URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data, let image = UIImage(data: data) {
+                // Сохраняем в кеш
+                imageCache.setObject(image, forKey: url as NSURL)
                 DispatchQueue.main.async {
                     completion(image)
                 }
             } else {
-                print("❌ loadFromURL: Failed to load image. URL = \(url.absoluteString)")
-                if let err = error {
-                    print("Error: \(err.localizedDescription)")
-                }
+                print("❌ loadFromURL: Ошибка загрузки изображения с \(url.absoluteString). Причина: \(error?.localizedDescription ?? "неизвестно")")
                 DispatchQueue.main.async {
-                    completion(UIImage.grayPlaceholder())
+                    completion(grayPlaceholder())
                 }
             }
         }.resume()
     }
 
-    /// Creates a solid gray placeholder image
+    /// Серое изображение-заглушка, если не удалось загрузить с URL
     private static func grayPlaceholder(size: CGSize = CGSize(width: 100, height: 100)) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { context in
@@ -258,3 +267,5 @@ extension UIImage {
         }
     }
 }
+
+
