@@ -30,7 +30,6 @@ class MainTabBarController: UITabBarController {
         welcomeController.addBulletedListItem(title: "Sell and trade your cards", description: "Exchange them for currency or make deals with players", symbolName: "arrow.left.arrow.right")
         
         welcomeController.addBoldButton(title: "Get Started") { self.dismiss(animated: true) }
-        welcomeController.addLinkButton(title: "Not Now") { self.dismiss(animated: true) }
         
         present(welcomeController.viewController, animated: true)
     
