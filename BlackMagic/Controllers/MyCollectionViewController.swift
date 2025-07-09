@@ -57,9 +57,21 @@ final class MyCollectionViewController: UIViewController {
     
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 111, height: 177)
-        layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 14
+        
+        // Динамический расчёт размеров для 3 карт в ряду
+        let numberOfItemsPerRow: CGFloat = 3
+        let spacing: CGFloat = 14
+        let sideInset: CGFloat = 16
+
+        let totalSpacing = spacing * (numberOfItemsPerRow - 1)
+        let availableWidth = view.bounds.width - (sideInset * 2) - totalSpacing
+        let cellWidth = floor(availableWidth / numberOfItemsPerRow)
+        let cellHeight = cellWidth * 1.4 // Соотношение сторон карты
+        
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
@@ -70,8 +82,8 @@ final class MyCollectionViewController: UIViewController {
         collectionView.delegate = self
         view.addSubview(collectionView)
         collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 13)
-        collectionView.pinLeft(to: view, 16)
-        collectionView.pinRight(to: view, 16)
+        collectionView.pinLeft(to: view, sideInset)
+        collectionView.pinRight(to: view, sideInset)
         collectionView.pinBottom(to: view)
         // Добавляем жест долгого нажатия
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))

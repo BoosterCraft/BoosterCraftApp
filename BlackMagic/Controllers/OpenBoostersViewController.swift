@@ -18,6 +18,8 @@ final class OpenBoostersViewController: UIViewController {
         view.backgroundColor = .black
         setupNavigationBar(balanceButton, title: "Open boosters")
         setupCollectionView()
+        // Устанавливаем стартовый баланс при первом открытии экрана
+        setInitialBalanceIfNeeded()
         reloadBoosters()
     }
 
@@ -92,6 +94,19 @@ final class OpenBoostersViewController: UIViewController {
         let nav = UINavigationController(rootViewController: openedVC)
         nav.modalPresentationStyle = .automatic
         present(nav, animated: true)
+    }
+
+    // Устанавливает стартовый баланс 500 при первом открытии экрана
+    private func setInitialBalanceIfNeeded() {
+        let key = "hasSetInitialBalance_OpenBoosters"
+        let defaults = UserDefaults.standard
+        if !defaults.bool(forKey: key) {
+            let initialBalance = UserBalance(coins: 500)
+            UserDataManager.shared.saveBalance(initialBalance)
+            defaults.set(true, forKey: key)
+            // Уведомляем другие экраны об изменении баланса
+            NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
+        }
     }
 
     deinit {

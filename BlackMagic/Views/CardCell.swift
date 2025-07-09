@@ -25,6 +25,7 @@ final class CardCell: UICollectionViewCell {
     private let stepperStack = UIStackView()
     private let minusButton = UIButton(type: .system)
     private let plusButton = UIButton(type: .system)
+    private let backStack = UIStackView() // стек для адаптивного размещения
 
     private var badgeCount = 0
     private var sellCount = 1
@@ -157,15 +158,25 @@ final class CardCell: UICollectionViewCell {
         badgeView.addSubview(badgeLabel)
         badgeLabel.pinCenter(to: badgeView)
 
-        minusButton.setTitle("-", for: .normal)
-        minusButton.titleLabel?.font = .systemFont(ofSize: 26)
-        minusButton.setTitleColor(.white, for: .normal)
-        minusButton.addTarget(self, action: #selector(stepperAction(_:)), for: .touchUpInside)
-
-        plusButton.setTitle("+", for: .normal)
-        plusButton.titleLabel?.font = .systemFont(ofSize: 26)
-        plusButton.setTitleColor(.white, for: .normal)
-        plusButton.addTarget(self, action: #selector(stepperAction(_:)), for: .touchUpInside)
+        // --- Стилизация степпера для лучшей видимости ---
+        let stepperBgColor = UIColor(white: 0.18, alpha: 1)
+//        let stepperBorderColor = UIColor.white.cgColor
+        let stepperCornerRadius: CGFloat = 8
+//        let stepperBorderWidth: CGFloat = 1.5
+        
+        stepperStack.backgroundColor = stepperBgColor
+        stepperStack.layer.cornerRadius = stepperCornerRadius
+//        stepperStack.layer.borderColor = stepperBorderColor
+//        stepperStack.layer.borderWidth = stepperBorderWidth
+        stepperStack.clipsToBounds = true
+        
+        // Кастомные изображения для минус/плюс (белые)
+        let minusImg = UIImage.textSymbol("-", font: .systemFont(ofSize: 26, weight: .bold), color: .white)
+        let plusImg = UIImage.textSymbol("+", font: .systemFont(ofSize: 26, weight: .bold), color: .white)
+        minusButton.setImage(minusImg, for: .normal)
+        minusButton.setTitle(nil, for: .normal)
+        plusButton.setImage(plusImg, for: .normal)
+        plusButton.setTitle(nil, for: .normal)
 
         stepperStack.axis = .horizontal
         stepperStack.distribution = .fillEqually
@@ -184,6 +195,24 @@ final class CardCell: UICollectionViewCell {
         cancelButton.setTitleColor(.white, for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
 
+        // --- Новый стек для адаптивного размещения на обороте ---
+        backStack.axis = .vertical
+        backStack.spacing = 12
+        backStack.distribution = .fill
+        backStack.alignment = .fill
+        backStack.addArrangedSubview(stepperStack)
+        backStack.addArrangedSubview(sellButton)
+        backStack.addArrangedSubview(cancelButton)
+        backContentView.addSubview(backStack)
+        backStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            backStack.topAnchor.constraint(equalTo: backContentView.topAnchor, constant: 16),
+            backStack.leftAnchor.constraint(equalTo: backContentView.leftAnchor, constant: 12),
+            backStack.rightAnchor.constraint(equalTo: backContentView.rightAnchor, constant: -12),
+            backStack.bottomAnchor.constraint(lessThanOrEqualTo: backContentView.bottomAnchor, constant: -12)
+        ])
+        // ---
+
         frontViewSetup()
     }
 
@@ -191,7 +220,7 @@ final class CardCell: UICollectionViewCell {
         contentView.addSubviews(imageContainerView, priceLabel, badgeView)
 
         imageContainerView.addSubviews(cardImageView, backContentView)
-        backContentView.addSubviews(stepperStack, sellButton, cancelButton)
+        // backContentView.addSubviews(stepperStack, sellButton, cancelButton) // больше не нужно, теперь через backStack
 
         // Layout image container
         imageContainerView.pinTop(to: contentView)
@@ -207,20 +236,30 @@ final class CardCell: UICollectionViewCell {
         priceLabel.pinRight(to: contentView)
         priceLabel.pinBottom(to: contentView)
 
-        badgeView.pinTop(to: cardImageView.topAnchor, -12)
-        badgeView.pinRight(to: cardImageView.trailingAnchor, -12)
+        // Бейдж теперь чуть выходит за пределы карточки в правом верхнем углу (через pin)
+        badgeView.pinTop(to: contentView, -8)
+        badgeView.pinRight(to: contentView, -8)
+        badgeView.setWidth(24)
+        badgeView.setHeight(24)
+    }
+}
 
-        stepperStack.pinTop(to: backContentView, 12)
-        stepperStack.pinLeft(to: backContentView, 12)
-        stepperStack.pinRight(to: backContentView, 12)
-        stepperStack.setHeight(40)
-
-        sellButton.pinTop(to: stepperStack.bottomAnchor, 12)
-        sellButton.pinLeft(to: backContentView, 12)
-        sellButton.pinRight(to: backContentView, 12)
-        sellButton.setHeight(44)
-
-        cancelButton.pinBottom(to: backContentView, 12)
-        cancelButton.pinCenterX(to: backContentView)
+// --- Вспомогательное расширение для создания изображения из текста ---
+extension UIImage {
+    static func textSymbol(_ text: String, font: UIFont, color: UIColor) -> UIImage? {
+        let size = CGSize(width: 32, height: 32)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        defer { UIGraphicsEndImageContext() }
+        let rect = CGRect(origin: .zero, size: size)
+        let style = NSMutableParagraphStyle()
+        style.alignment = .center
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: color,
+            .paragraphStyle: style
+        ]
+        let textRect = CGRect(x: 0, y: (size.height-font.lineHeight)/2, width: size.width, height: font.lineHeight)
+        text.draw(in: textRect, withAttributes: attrs)
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
