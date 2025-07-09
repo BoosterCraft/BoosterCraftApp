@@ -7,6 +7,9 @@ final class BoosterOpenedViewController: UIViewController {
     private let totalLabel = UILabel()
     private var collectionView: UICollectionView!
 
+    // Массив реальных карт, полученных из Scryfall
+    private var cards: [Card] = []
+
     private let bottomBarBackgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.15, alpha: 1)
@@ -45,6 +48,26 @@ final class BoosterOpenedViewController: UIViewController {
         view.backgroundColor = .black
         isModalInPresentation = true
         setupUI()
+        // Загружаем карты для первого бустера (или любого нужного сета)
+        if let firstBooster = boosterData.first {
+            // Выводим в консоль код сета
+            print("[BoosterOpenedViewController] Загружаем карты для сета: \(firstBooster.setCode)")
+            ScryfallServiceManager.shared.fetchCards(forSet: firstBooster.setCode) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let fetchedCards):
+                        self?.cards = fetchedCards
+                        // Печатаем все image_url в консоль
+                        for card in fetchedCards {
+                            print("[BoosterOpenedViewController] image_url: \(card.image_url ?? "nil") for card: \(card.name)")
+                        }
+                        self?.collectionView.reloadData()
+                    case .failure(let error):
+                        print("[BoosterOpenedViewController] Ошибка загрузки карт: \(error)")
+                    }
+                }
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -152,7 +175,8 @@ final class BoosterOpenedViewController: UIViewController {
 
 extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return boosterData.count
+        // Показываем реальные карты, если они загружены, иначе 0
+        return cards.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -161,22 +185,10 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
             for: indexPath
         ) as! CardCell
 
-        let booster = boosterData[indexPath.item]
-        // Преобразуем UserBooster в Card (заполняем тестовыми данными)
-        let card = Card(
-            id: UUID().uuidString,
-            name: booster.setCode, // временно используем setCode как имя
-            type_line: booster.type.rawValue,
-            mana_cost: nil,
-            oracle_text: nil,
-            rarity: nil,
-            set: booster.setCode,
-            set_name: nil,
-            image_url: nil,
-            price_usd: nil,
-            count: 1
-        )
-        cell.configure(with: card)
+        // Берём реальную карту
+        let card = cards[indexPath.item]
+        print("[BoosterOpenedViewController] Отображается карта: id=\(card.id), name=\(card.name), image_url=\(card.image_url ?? "nil")")
+        cell.configure(with: card, showBadge: false)
         return cell
     }
 

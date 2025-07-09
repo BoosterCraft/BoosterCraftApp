@@ -46,9 +46,16 @@ final class CardCell: UICollectionViewCell {
         updateSellTitle()
     }
 
-    func configure(with card: Card) {
-        // TODO: если появится image_url, можно добавить асинхронную загрузку
-        cardImageView.image = UIImage(named: card.name) // временно используем name как imageName
+    func configure(with card: Card, showBadge: Bool = true) {
+        if let url = card.image_url {
+            ScryfallServiceManager.shared.loadCardImage(from: url) { [weak self] image in
+                DispatchQueue.main.async {
+                    self?.cardImageView.image = image ?? UIImage(named: card.name)
+                }
+            }
+        } else {
+            cardImageView.image = UIImage(named: card.name)
+        }
         badgeCount = card.count
         sellCount = 1
         if let priceString = card.price_usd, let price = Double(priceString) {
@@ -56,7 +63,7 @@ final class CardCell: UICollectionViewCell {
         } else {
             priceLabel.text = ""
         }
-        badgeView.isHidden = badgeCount == 0
+        badgeView.isHidden = !showBadge || badgeCount == 0
         badgeLabel.text = "\(badgeCount)"
         updateSellTitle()
     }
@@ -172,7 +179,7 @@ final class CardCell: UICollectionViewCell {
         imageContainerView.pinTop(to: contentView)
         imageContainerView.pinLeft(to: contentView)
         imageContainerView.pinRight(to: contentView)
-        imageContainerView.setHeight(155)
+        // imageContainerView.setHeight(155) // Удалено для устранения конфликтов
 
         cardImageView.pin(to: imageContainerView)
         backContentView.pin(to: imageContainerView)

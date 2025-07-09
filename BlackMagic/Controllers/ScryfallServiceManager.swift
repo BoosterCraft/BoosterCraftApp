@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 // Импортируем модель сета
 // (предполагается, что файл ScryfallSet.swift находится в папке Models)
@@ -86,5 +87,123 @@ class ScryfallServiceManager {
             }
         }
         task.resume()
+    }
+
+    // MARK: - Логирование
+    private func log(_ message: String) {
+        print("[ScryfallServiceManager] " + message)
+    }
+
+    // MARK: - Получение карт с логированием
+    func fetchCards(forSet setCode: String, completion: @escaping (Result<[Card], Error>) -> Void) {
+        var allCards: [Card] = []
+        let baseURL = "https://api.scryfall.com/cards/search?q=e:\(setCode)"
+        log("Начинаю загрузку карт для сета: \(setCode), URL: \(baseURL)")
+        
+        func fetchPage(url: String) {
+            guard let url = URL(string: url) else {
+                self.log("Ошибка: некорректный URL: \(url)")
+                completion(.failure(NSError(domain: "bad_url", code: 0)))
+                return
+            }
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    self.log("Ошибка загрузки: \(error)")
+                    completion(.failure(error))
+                    return
+                }
+                guard let data = data else {
+                    self.log("Нет данных в ответе")
+                    completion(.failure(NSError(domain: "no_data", code: 0)))
+                    return
+                }
+                do {
+                    let decoder = JSONDecoder()
+                    let response = try decoder.decode(ScryfallCardsResponse.self, from: data)
+                    // Логируем JSON-объект каждой карты
+                    if let jsonArray = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let cards = jsonArray["data"] as? [[String: Any]] {
+                        for cardJSON in cards {
+                            if let cardData = try? JSONSerialization.data(withJSONObject: cardJSON),
+                               let cardString = String(data: cardData, encoding: .utf8) {
+                                self.log("JSON карты: \(cardString)")
+                            }
+                        }
+                    }
+                    let pageCards = response.data.map { $0.toCard() }
+                    allCards.append(contentsOf: pageCards)
+                    if let next = response.next_page {
+                        fetchPage(url: next)
+                    } else {
+                        self.log("Загружено всего карт: \(allCards.count)")
+                        completion(.success(allCards))
+                    }
+                } catch {
+                    self.log("Ошибка декодирования: \(error)")
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
+        fetchPage(url: baseURL)
+    }
+
+    // MARK: - Асинхронная загрузка изображения карты с логированием
+    func loadCardImage(from urlString: String?, completion: @escaping (UIImage?) -> Void) {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            self.log("Ошибка: некорректный URL изображения: \(urlString ?? "nil")")
+            completion(nil as UIImage?)
+            return
+        }
+        self.log("Начинаю загрузку изображения: \(url)")
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error {
+                self.log("Ошибка загрузки изображения: \(error)")
+                completion(nil as UIImage?)
+                return
+            }
+            guard let data = data, let image = UIImage(data: data) else {
+                self.log("Ошибка: не удалось создать изображение из данных")
+                completion(nil as UIImage?)
+                return
+            }
+            self.log("Изображение успешно загружено: \(url)")
+            completion(image)
+        }.resume()
+    }
+} 
+
+// MARK: - Вспомогательные структуры для декодирования Scryfall
+private struct ScryfallCardsResponse: Codable {
+    let data: [ScryfallCard]
+    let next_page: String?
+}
+
+private struct ScryfallCard: Codable {
+    let id: String
+    let name: String
+    let type_line: String?
+    let mana_cost: String?
+    let oracle_text: String?
+    let rarity: String?
+    let set: String?
+    let set_name: String?
+    let image_uris: [String: String]?
+    // Важно: значения в prices могут быть null (например, "usd_etched": null), поэтому используем String? как значение
+    let prices: [String: String?]?
+    
+    func toCard() -> Card {
+        Card(
+            id: id,
+            name: name,
+            type_line: type_line,
+            mana_cost: mana_cost,
+            oracle_text: oracle_text,
+            rarity: rarity,
+            set: set,
+            set_name: set_name,
+            image_url: image_uris?["normal"],
+            price_usd: prices?["usd"] ?? nil,
+            count: 1
+        )
     }
 } 
