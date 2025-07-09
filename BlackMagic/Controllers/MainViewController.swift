@@ -92,6 +92,11 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
             }
         }
     }
+    // MARK: Обновление баланса
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        balanceButton.updateBalance()
+    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
