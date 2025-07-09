@@ -13,10 +13,10 @@ class MainTabBarController: UITabBarController {
         tabBar.isTranslucent = true
     }
     override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            showOnboardingIfNeeded()
-        }
-
+        super.viewDidAppear(animated)
+        showOnboardingIfNeeded()
+    }
+    
     private func showOnboardingIfNeeded() {
         // Проверяем, был ли онбординг уже пройден
         
@@ -30,13 +30,13 @@ class MainTabBarController: UITabBarController {
         welcomeController.addBoldButton(title: "Get Started") { self.dismiss(animated: true) }
         guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else {
             present(welcomeController.viewController, animated: true)
-        return
+            return
             
         }
     }
-       
     
-
+    
+    
     
     // MARK: - Setup Tabs
     
@@ -44,17 +44,17 @@ class MainTabBarController: UITabBarController {
         let mainVC = MainViewController()
         let boostersVC = OpenBoostersViewController()
         let collectionVC = MyCollectionViewController()
-
-//        let collectionVC = UIViewController()
         
         mainVC.tabBarItem = UITabBarItem(title: "Buy boosters", image: UIImage(systemName: "cart.fill"), tag: 0)
         boostersVC.tabBarItem = UITabBarItem(title: "Open boosters", image: UIImage(systemName: "gift.fill"), tag: 1)
         collectionVC.tabBarItem = UITabBarItem(title: "My collection", image: UIImage(systemName: "book.fill"), tag: 2)
         
         viewControllers = [
-            UINavigationController(rootViewController: mainVC),
             UINavigationController(rootViewController: boostersVC),
+            UINavigationController(rootViewController: mainVC),
             UINavigationController(rootViewController: collectionVC)
         ]
+        
+        selectedIndex = 1
     }
 }
