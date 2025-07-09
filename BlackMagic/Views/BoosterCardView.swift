@@ -185,6 +185,7 @@ class BoosterCardView: UIView {
         priceButton.pinRight(to: backView, 16)
         priceButton.setHeight(mode: .equal, 50)
         priceButton.pinBottom(to: backView, 16)
+        priceButton.addTarget(self, action: #selector(flipCardAnimated), for: .touchUpInside)
         
         // Tap to flip back
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(flipCardAnimated))

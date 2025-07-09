@@ -128,7 +128,7 @@ final class BoosterOpenedViewController: UIViewController {
         collectionView.register(CardCell.self, forCellWithReuseIdentifier: CardCell.identifier)
 
         view.addSubview(collectionView)
-        collectionView.pinTop(to: totalLabel.bottomAnchor, 8)
+        collectionView.pinTop(to: totalLabel.bottomAnchor, 20)
         collectionView.pinLeft(to: view, inset)
         collectionView.pinRight(to: view, inset)
         collectionView.pinBottom(to: view, 98)
@@ -222,7 +222,7 @@ final class BoosterOpenedViewController: UIViewController {
         let selectedPrice = (0..<selectedCount).map { _ in Double.random(in: 0.01...3.5) }.reduce(0, +)
         
         if selectedCount > 0 {
-            totalLabel.text = "Total cards: \(totalCards) | Selected: \(selectedCount) | Selected price: $\(String(format: "%.2f", selectedPrice))"
+            totalLabel.text = "Selected: \(selectedCount) | Selected price: $\(String(format: "%.2f", selectedPrice))"
         } else {
             totalLabel.text = "Total cards: \(totalCards)     Total price: $\(String(format: "%.2f", totalPrice))"
         }
@@ -302,14 +302,27 @@ final class BoosterOpenedViewController: UIViewController {
             selectedCards.contains(card.id) ? index : nil
         }.sorted(by: >) // Сортируем в обратном порядке для корректного удаления
         
-        // Удаляем карты из массива
+        // Считаем сумму продажи выбранных карт
+        var saleValue: Double = 0
         for index in selectedIndices {
             let removedCard = cards.remove(at: index)
+            if let priceString = removedCard.price_usd, let price = Double(priceString) {
+                saleValue += price
+            }
             print("[BoosterOpenedViewController] 🗑️ Продана карта: \(removedCard.name)")
         }
         
         // Очищаем выбранные карты
         selectedCards.removeAll()
+        
+        // Обновляем баланс пользователя
+        if saleValue > 0 {
+            var balance = UserDataManager.shared.loadBalance()
+            balance.coins += saleValue
+            UserDataManager.shared.saveBalance(balance)
+            // Уведомляем другие экраны об изменении баланса
+            NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
+        }
         
         // Обновляем UI с анимацией
         UIView.animate(withDuration: 0.3) {
@@ -324,9 +337,26 @@ final class BoosterOpenedViewController: UIViewController {
     @objc private func handleSellAllTapped() {
         print("[BoosterOpenedViewController] Пользователь продает все \(cards.count) карт")
         
+        // Считаем сумму продажи всех карт
+        let saleValue: Double = cards.compactMap { card in
+            if let priceString = card.price_usd, let price = Double(priceString) {
+                return price
+            }
+            return nil
+        }.reduce(0, +)
+        
         // Анимированно удаляем все карты
         cards.removeAll()
         selectedCards.removeAll()
+        
+        // Обновляем баланс пользователя
+        if saleValue > 0 {
+            var balance = UserDataManager.shared.loadBalance()
+            balance.coins += saleValue
+            UserDataManager.shared.saveBalance(balance)
+            // Уведомляем другие экраны об изменении баланса
+            NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
+        }
         
         UIView.animate(withDuration: 0.3) {
             self.collectionView.reloadData()
