@@ -48,9 +48,12 @@ final class BoosterOpenedViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let fetchedCards):
-                    self?.cards = fetchedCards
-                    // Печатаем все image_url в консоль
-                    for card in fetchedCards {
+                    // Выбираем случайные 12 уникальных карт из набора (или меньше, если карт меньше 12)
+                    let count = min(12, fetchedCards.count)
+                    let randomCards = Array(fetchedCards.shuffled().prefix(count))
+                    self?.cards = randomCards
+                    // Печатаем все image_url выбранных карт в консоль
+                    for card in randomCards {
                         print("[BoosterOpenedViewController] image_url: \(card.image_url ?? "nil") for card: \(card.name)")
                     }
                     self?.collectionView.reloadData()
