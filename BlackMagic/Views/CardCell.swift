@@ -177,7 +177,7 @@ final class CardCell: UICollectionViewCell {
         cardImageView.pin(to: imageContainerView)
         backContentView.pin(to: imageContainerView)
 
-        priceLabel.pinTop(to: imageContainerView.bottomAnchor)
+        priceLabel.pinTop(to: imageContainerView.bottomAnchor, 3)
         priceLabel.pinLeft(to: contentView)
         priceLabel.pinRight(to: contentView)
         priceLabel.pinBottom(to: contentView)
