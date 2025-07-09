@@ -234,6 +234,9 @@ final class BoosterOpenedViewController: UIViewController {
         // Сохраняем оставшиеся карты в коллекцию пользователя
         saveRemainingCardsToCollection()
         
+        // Отправляем уведомление для обновления коллекции карт
+        NotificationCenter.default.post(name: .didOpenBooster, object: nil)
+        
         // Удаляем один бустер этого типа из пользовательских данных
         removeOneOpenedBoosterFromUserData()
         
