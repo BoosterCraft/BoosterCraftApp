@@ -22,6 +22,7 @@ class BalanceButton: UIButton {
         setImage(UIImage(systemName: "creditcard.fill"), for: .normal)
         tintColor = .systemBlue
         imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0)
+        addTarget(self, action: #selector(setDebugBalance), for: .touchUpInside)
     }
     
     // Обновить баланс на кнопке
@@ -32,7 +33,14 @@ class BalanceButton: UIButton {
         let balanceString = "$\(rounded)"
         setTitle(balanceString, for: .normal)
     }
-} 
+    @objc func setDebugBalance() {
+        #if DEBUG
+        let balance = UserDataManager.shared.loadBalance()
+        UserDataManager.shared.saveBalance(UserBalance(coins: balance.coins + 1000))
+        updateBalance()
+        #endif
+    }
+}
 // другой вариант
 // import UIKit
 
