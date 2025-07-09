@@ -69,7 +69,7 @@ final class MyCollectionViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         view.addSubview(collectionView)
-        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 16)
+        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 13)
         collectionView.pinLeft(to: view, 16)
         collectionView.pinRight(to: view, 16)
         collectionView.pinBottom(to: view)

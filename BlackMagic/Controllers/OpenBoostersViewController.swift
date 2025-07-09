@@ -58,7 +58,7 @@ final class OpenBoostersViewController: UIViewController {
 
         view.addSubview(collectionView)
 
-        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 13)
         collectionView.pinLeft(to: view, sideInset)
         collectionView.pinRight(to: view, sideInset)
         collectionView.pinBottom(to: view)
