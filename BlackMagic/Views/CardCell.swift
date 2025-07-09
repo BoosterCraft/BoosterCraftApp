@@ -110,6 +110,24 @@ final class CardCell: UICollectionViewCell {
         sellButton.setTitle("Sell \(sellCount)", for: .normal)
     }
 
+    // Создание снапшота с возможностью скрыть цену и бейдж
+    func snapshotView(hidePriceAndBadge: Bool) -> UIView? {
+        // Сохраняем текущее состояние
+        let oldPriceHidden = priceLabel.isHidden
+        let oldBadgeHidden = badgeView.isHidden
+        // Скрываем элементы, если нужно
+        if hidePriceAndBadge {
+            priceLabel.isHidden = true
+            badgeView.isHidden = true
+        }
+        // Создаем снапшот
+        let snapshot = self.snapshotView(afterScreenUpdates: true)
+        // Возвращаем элементы в исходное состояние
+        priceLabel.isHidden = oldPriceHidden
+        badgeView.isHidden = oldBadgeHidden
+        return snapshot
+    }
+
     private func configureUI() {
         contentView.clipsToBounds = false
         imageContainerView.clipsToBounds = false

@@ -15,6 +15,10 @@ final class MyCollectionViewController: UIViewController {
 
     private var collectionView: UICollectionView!
     private var cardData: [Card] = []
+    private var expandedCardSnapshot: UIView? // Снапшот увеличенной карточки
+    private var overlayView: UIView? // Затемнение фона
+    private var originalCellFrame: CGRect? // Оригинальная рамка ячейки
+    private var expandedIndexPath: IndexPath? // Индекс выбранной ячейки
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,6 +73,9 @@ final class MyCollectionViewController: UIViewController {
         collectionView.pinLeft(to: view, 16)
         collectionView.pinRight(to: view, 16)
         collectionView.pinBottom(to: view)
+        // Добавляем жест долгого нажатия
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        collectionView.addGestureRecognizer(longPressGesture)
     }
 
     // MARK: - Продажа карт
@@ -104,6 +111,72 @@ final class MyCollectionViewController: UIViewController {
         
         UserDataManager.shared.saveBalance(newBalance)
         balanceButton.updateBalance()
+    }
+
+    // MARK: - Обработка долгого нажатия на карточку
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        let location = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: location),
+              let cell = collectionView.cellForItem(at: indexPath) as? CardCell else { return }
+
+        switch gesture.state {
+        case .began:
+            // Если уже есть увеличенная карточка, ничего не делаем
+            guard expandedCardSnapshot == nil else { return }
+            // Создаем снапшот ячейки
+            guard let snapshot = cell.snapshotView(hidePriceAndBadge: true) else { return }
+            let cellFrame = cell.convert(cell.bounds, to: view)
+            snapshot.frame = cellFrame
+            view.addSubview(snapshot)
+            cell.isHidden = true
+
+            // Создаем затемнение фона
+            let overlay = UIView(frame: view.bounds)
+            overlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+            overlay.alpha = 0
+            let tap = UITapGestureRecognizer(target: self, action: #selector(handleOverlayTap))
+            overlay.addGestureRecognizer(tap)
+            view.insertSubview(overlay, belowSubview: snapshot)
+
+            // Анимируем увеличение карточки и появление затемнения
+            UIView.animate(withDuration: 0.3, animations: {
+                overlay.alpha = 1
+                let center = self.view.center
+                let scale: CGFloat = 3.1 
+                snapshot.center = center
+                snapshot.transform = CGAffineTransform(scaleX: scale, y: scale)
+            })
+
+            expandedCardSnapshot = snapshot
+            overlayView = overlay
+            originalCellFrame = cellFrame
+            expandedIndexPath = indexPath
+        default:
+            break
+        }
+    }
+
+    // MARK: - Обработка тапа по затемнению для возврата карточки
+    @objc private func handleOverlayTap() {
+        guard let snapshot = expandedCardSnapshot,
+              let overlay = overlayView,
+              let indexPath = expandedIndexPath,
+              let cellFrame = originalCellFrame,
+              let cell = collectionView.cellForItem(at: indexPath) as? CardCell else { return }
+
+        UIView.animate(withDuration: 0.3, animations: {
+            overlay.alpha = 0
+            snapshot.frame = cellFrame
+            snapshot.transform = .identity
+        }, completion: { _ in
+            cell.isHidden = false
+            snapshot.removeFromSuperview()
+            overlay.removeFromSuperview()
+            self.expandedCardSnapshot = nil
+            self.overlayView = nil
+            self.originalCellFrame = nil
+            self.expandedIndexPath = nil
+        })
     }
 }
 
