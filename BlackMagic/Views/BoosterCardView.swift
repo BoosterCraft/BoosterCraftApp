@@ -35,12 +35,13 @@ class BoosterCardView: UIView {
          titleBackgroundColor: UIColor,
          buttonTextColor: UIColor,
          titleFontSize: Int,
-         backData: BoosterBackData)
+         set: ScryfallSet,
+         price: String = "$50")
     {
         super.init(frame: .zero)
         setupViews()
         setupFront(imageURL: imageURL, title: title, description: description, titleColor: titleColor, titleBackgroundColor: titleBackgroundColor, buttonTextColor: buttonTextColor, titleFontSize: titleFontSize)
-        setupBack(with: backData)
+        setupBack(with: set, price: price)
         showFront()
     }
 
@@ -128,18 +129,18 @@ class BoosterCardView: UIView {
     }
 
 
-    private func setupBack(with data: BoosterBackData) {
+    private func setupBack(with set: ScryfallSet, price: String) {
         backTitleLabel.font = UIFont.boldSystemFont(ofSize: 20)
         backTitleLabel.textColor = .white
         backTitleLabel.textAlignment = .center
-        backTitleLabel.text = data.title
+        backTitleLabel.text = set.name
         
         segmentedControl.selectedSegmentIndex = 0
         
         detailsLabel.font = UIFont.systemFont(ofSize: 16)
         detailsLabel.textColor = .white
         detailsLabel.numberOfLines = 0
-        detailsLabel.text = data.details
+        detailsLabel.text = "Код: \(set.code)\nТип: \(set.set_type)\nКарт: \(set.card_count)\nДата релиза: \(set.released_at)"
         
         quantityStepper.minimumValue = 1
         quantityStepper.maximumValue = 10
@@ -151,7 +152,7 @@ class BoosterCardView: UIView {
         quantityLabel.text = "1"
         quantityLabel.textAlignment = .center
         
-        priceButton.setTitle("Buy for 50", for: .normal)
+        priceButton.setTitle("Buy for \(price)", for: .normal)
         priceButton.setTitleColor(.white, for: .normal)
         priceButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         priceButton.backgroundColor = .systemBlue

@@ -4,7 +4,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     
     // MARK: - Properties
     
-    private var boosterCardsData: [(title: String, description: String, imageURL: URL?, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, titleFontSize: Int, backData: BoosterBackData)] = []
+    private var boosterCardsData: [(title: String, description: String, imageURL: URL?, titleColor: UIColor, titleBackgroundColor: UIColor, buttonTextColor: UIColor, titleFontSize: Int, set: ScryfallSet, price: String)] = []
     
     private var currentPage = 0 {
         didSet {
@@ -116,6 +116,14 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
     }
     
     private func setupCardData() {
+        // Примерные (заглушки) данные сетов для статических карточек
+        let stubSets: [ScryfallSet] = [
+            ScryfallSet(code: "TDM", name: "Final Fantasy", set_type: "expansion", card_count: 300, released_at: "2025-07-01", icon_svg_uri: nil),
+            ScryfallSet(code: "TDR", name: "Tarkir: dragonstorm", set_type: "expansion", card_count: 250, released_at: "2025-06-01", icon_svg_uri: nil),
+            ScryfallSet(code: "AED", name: "AETHERDRIFT", set_type: "expansion", card_count: 200, released_at: "2025-05-01", icon_svg_uri: nil),
+            ScryfallSet(code: "DSK", name: "Duskmourn: house of horror", set_type: "expansion", card_count: 180, released_at: "2025-04-01", icon_svg_uri: nil),
+            ScryfallSet(code: "BLB", name: "bloomburrow", set_type: "expansion", card_count: 160, released_at: "2025-03-01", icon_svg_uri: nil)
+        ]
         boosterCardsData = [
             (
                 title: "Final Fantasy".uppercased(),
@@ -125,11 +133,8 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 titleBackgroundColor: UIColor(red: 255, green: 255, blue: 255),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
                 titleFontSize: 20,
-                BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$6.51"
-                )
+                set: stubSets[0],
+                price: "$6.51"
             ),
             (
                 title: "Tarkir: dragonstorm".uppercased(),
@@ -139,11 +144,8 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 titleBackgroundColor: UIColor(red: 219, green: 240, blue: 252),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
                 titleFontSize: 20,
-                BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$6.51"
-                )
+                set: stubSets[1],
+                price: "$6.51"
             ),
             (
                 title: "AETHERDRIFT".uppercased(),
@@ -153,11 +155,8 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 titleBackgroundColor: UIColor(red: 253, green: 185, blue: 1),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
                 titleFontSize: 20,
-                BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$6.51"
-                )
+                set: stubSets[2],
+                price: "$6.51"
             ),
             (
                 title: "Duskmourn: house of horror".uppercased(),
@@ -167,15 +166,10 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 titleBackgroundColor: UIColor(red: 157, green: 203, blue: 185),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
                 titleFontSize: 14,
-                BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$6.51"
-                )
+                set: stubSets[3],
+                price: "$6.51"
             ),
-           
             (
-                
                 title: "bloomburrow".uppercased(),
                 description: "Venture to a tiny idyllic land, and gather your friends in a woodland party, take to the battlefield and defend your folk!",
                 imageURL: URL(string: "https://raw.githubusercontent.com/ReSpringLover/imges/refs/heads/main/bloomburrow.png") ,
@@ -183,29 +177,18 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 titleBackgroundColor: UIColor(red: 10, green: 107, blue: 61),
                 buttonTextColor:UIColor(red: 28, green: 28, blue: 28),
                 titleFontSize: 20,
-                BoosterBackData(
-                    title: "TDM booster",
-                    details: "• 5 Rare or higher\n• 3–5 Uncommon\n• 4–6 Common\n• 1 Full-art land",
-                    price: "$6.51"
-                )
+                set: stubSets[4],
+                price: "$6.51"
             ),
         ]
-        
         // Получаем 5 последних сетов-экспансий из Scryfall
         ScryfallServiceManager.shared.fetchLatestExpansions { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let sets):
-                    // Обновляем только BoosterBackData для каждой карточки
                     for (i, set) in sets.prefix(self?.boosterCardsData.count ?? 0).enumerated() {
-                        // Формируем новые данные для обратной стороны
-                        let newBack = BoosterBackData(
-                            title: set.name,
-                            details: "Код: \(set.code)\nТип: \(set.set_type)\nКарт: \(set.card_count)\nДата релиза: \(set.released_at)",
-                            price: "$50" // Устанавливаем дефолтную цену
-                        )
-                        // Обновляем только backData, остальное не трогаем
-                        self?.boosterCardsData[i].backData = newBack
+                        self?.boosterCardsData[i].set = set
+                        self?.boosterCardsData[i].price = "$50"
                     }
                     self?.boosterCollectionView.reloadData()
                 case .failure(let error):
@@ -262,12 +245,13 @@ extension MainViewController: UICollectionViewDataSource {
             titleBackgroundColor: data.titleBackgroundColor,
             buttonTextColor: data.buttonTextColor,
             titleFontSize: data.titleFontSize,
-            backData: data.backData
+            set: data.set,
+            price: data.price
         )
         // Устанавливаем код сета для покупки
-        cardView.configurePurchase(setCode: data.backData.title)
+        cardView.configurePurchase(setCode: data.set.code)
         // Обработка покупки
-        cardView.onBuyTapped = { [weak self] purchaseInfo in
+        cardView.onBuyTapped = { [weak self] (purchaseInfo: BoosterPurchaseInfo) in
             guard let self = self else { return }
             let price = purchaseInfo.quantity * 50
             var balance = UserDataManager.shared.loadBalance()
@@ -298,12 +282,12 @@ extension MainViewController: UICollectionViewDataSource {
                 // Уведомляем другие экраны о покупке бустера
                 NotificationCenter.default.post(name: .didPurchaseBooster, object: nil)
                 // Показываем алерт об успешной покупке
-                let alert = UIAlertController(title: "Покупка успешна", message: "Вы купили \(purchaseInfo.quantity) бустер(ов)", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Покупка успешна!", message: "Вы купили \(purchaseInfo.quantity) бустер(ов) сета \(purchaseInfo.setCode)", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             } else {
                 // Недостаточно средств
-                let alert = UIAlertController(title: "Недостаточно средств", message: "Пополните баланс для покупки.", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Недостаточно монет", message: "Пополните баланс для покупки.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             }
