@@ -27,7 +27,9 @@ class BalanceButton: UIButton {
     // Обновить баланс на кнопке
     func updateBalance() {
         let balance = UserDataManager.shared.loadBalance()
-        let balanceString = "$\(balance.coins)"
+        // Округляем баланс до двух знаков после запятой для красивого отображения
+        let rounded = String(format: "%.2f", balance.coins)
+        let balanceString = "$\(rounded)"
         setTitle(balanceString, for: .normal)
     }
 } 

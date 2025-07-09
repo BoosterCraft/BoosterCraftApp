@@ -111,6 +111,8 @@ final class MyCollectionViewController: UIViewController {
         
         UserDataManager.shared.saveBalance(newBalance)
         balanceButton.updateBalance()
+        // Уведомляем другие экраны об изменении баланса
+        NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
     }
 
     // MARK: - Обработка долгого нажатия на карточку
@@ -205,5 +207,6 @@ extension MyCollectionViewController: UICollectionViewDataSource, UICollectionVi
 // MARK: - Notification.Name Extension
 extension Notification.Name {
     static let didOpenBooster = Notification.Name("didOpenBooster")
+    static let didUpdateBalance = Notification.Name("didUpdateBalance")
 }
 

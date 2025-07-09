@@ -65,12 +65,11 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = .black
         // Для теста: устанавливаем баланс пользователя в 500 монет
-        let testBalance = UserBalance(coins: 500)
-        UserDataManager.shared.saveBalance(testBalance)
-        balanceButton.updateBalance()
         setupLayout()
         setupCardData()
         setupPageControl()
+        // Подписываемся на обновление баланса
+        NotificationCenter.default.addObserver(self, selector: #selector(handleBalanceUpdate), name: .didUpdateBalance, object: nil)
         // Test ScryfallServiceManager: Fetch a card by name and print result
         ScryfallServiceManager.shared.fetchCard(named: "Black Lotus") { result in
             switch result {
@@ -94,6 +93,14 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
         }
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func handleBalanceUpdate() {
+        balanceButton.updateBalance()
+    }
+
     // MARK: - Layout
     
     private func setupLayout() {
