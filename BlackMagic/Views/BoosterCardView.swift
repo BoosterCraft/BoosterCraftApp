@@ -140,7 +140,7 @@ class BoosterCardView: UIView {
         detailsLabel.font = UIFont.systemFont(ofSize: 16)
         detailsLabel.textColor = .white
         detailsLabel.numberOfLines = 0
-        detailsLabel.text = "Код: \(set.code)\nТип: \(set.set_type)\nКарт: \(set.card_count)\nДата релиза: \(set.released_at)"
+        detailsLabel.text = "5 Rare or higher\n3-5 Uncommon\n4-6 Common\n1 Full-art land"
         
         quantityStepper.minimumValue = 1
         quantityStepper.maximumValue = 10
