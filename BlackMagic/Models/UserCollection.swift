@@ -9,5 +9,5 @@ struct UserCollection: Codable {
 // Модель для хранения баланса пользователя
 struct UserBalance: Codable {
     // Баланс (например, количество монет)
-    var coins: Int
+    var coins: Double
 } 

@@ -271,9 +271,9 @@ extension MainViewController: UICollectionViewDataSource {
             guard let self = self else { return }
             let price = purchaseInfo.quantity * 50
             var balance = UserDataManager.shared.loadBalance()
-            if balance.coins >= price {
+            if balance.coins >= Double(price) {
                 // Достаточно средств
-                balance.coins -= price
+                balance.coins -= Double(price)
                 UserDataManager.shared.saveBalance(balance)
                 self.balanceButton.updateBalance()
                 // Сохраняем купленные бустеры
