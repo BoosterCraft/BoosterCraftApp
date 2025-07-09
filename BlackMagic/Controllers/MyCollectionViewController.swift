@@ -36,43 +36,22 @@ final class MyCollectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        setupNavigationBar()
+        setupNavigationBar(balanceButton, title: "My collection")
         setupCollectionView()
     }
     
-    // MARK: Обновление баланса
+//    // MARK: Обновление баланса
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         balanceButton.updateBalance()
     }
 
-    private func setupNavigationBar() {
-        balanceButton.frame.size = balanceButton.intrinsicContentSize
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-        navigationItem.setLargeTitleAccessoryView(with: balanceButton)
-        title = "My collection"
-
-        if let navBar = navigationController?.navigationBar {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .black
-            appearance.largeTitleTextAttributes = [
-                .font: UIFont(name: "PirataOne-Regular", size: 40) ?? .boldSystemFont(ofSize: 40),
-                .foregroundColor: UIColor.white
-            ]
-            navBar.standardAppearance = appearance
-            navBar.scrollEdgeAppearance = appearance
-            navBar.compactAppearance = appearance
-        }
-    }
-
+    
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 111, height: 177)
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 14
-
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
@@ -81,7 +60,6 @@ final class MyCollectionViewController: UIViewController {
         collectionView.register(CardCell.self, forCellWithReuseIdentifier: CardCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
-
         view.addSubview(collectionView)
         collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 16)
         collectionView.pinLeft(to: view, 16)
@@ -126,3 +104,4 @@ extension MyCollectionViewController: UICollectionViewDataSource, UICollectionVi
         (collectionView.cellForItem(at: indexPath) as? CardCell)?.flip()
     }
 }
+

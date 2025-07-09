@@ -16,7 +16,7 @@ final class OpenBoostersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        setupNavigationBar()
+        setupNavigationBar(balanceButton, title: "Open boosters")
         setupCollectionView()
         reloadBoosters()
         // Подписываемся на уведомление о покупке бустера
@@ -29,36 +29,6 @@ final class OpenBoostersViewController: UIViewController {
         balanceButton.updateBalance()
     }
     
-    private func setupNavigationBar() {
-        let accessoryView = balanceButton
-        accessoryView.frame.size = CGSize(width: 50, height: 34)
-
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-        navigationItem.setLargeTitleAccessoryView(with: accessoryView)
-        title = "Open boosters"
-
-        if let navigationBar = navigationController?.navigationBar {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .black
-            appearance.largeTitleTextAttributes = [
-                .font: UIFont(name: "PirataOne-Regular", size: 40)!,
-                .foregroundColor: UIColor.white
-            ]
-            appearance.titleTextAttributes = [
-                .font: UIFont.systemFont(ofSize: 20, weight: .bold),
-                .foregroundColor: UIColor.white
-            ]
-
-            navigationBar.standardAppearance = appearance
-            navigationBar.scrollEdgeAppearance = appearance
-            navigationBar.compactAppearance = appearance
-        }
-
-        view.backgroundColor = .black
-    }
-
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         
