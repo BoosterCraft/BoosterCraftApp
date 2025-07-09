@@ -46,12 +46,16 @@ final class CardCell: UICollectionViewCell {
         updateSellTitle()
     }
 
-    func configure(with card: MyCollectionViewController.Card) {
-        cardImageView.image = UIImage(named: card.imageName)
-        badgeCount = card.badgeCount
+    func configure(with card: Card) {
+        // TODO: если появится image_url, можно добавить асинхронную загрузку
+        cardImageView.image = UIImage(named: card.name) // временно используем name как imageName
+        badgeCount = card.count
         sellCount = 1
-        priceLabel.text = String(format: "$%.2f", card.price)
-
+        if let priceString = card.price_usd, let price = Double(priceString) {
+            priceLabel.text = String(format: "$%.2f", price)
+        } else {
+            priceLabel.text = ""
+        }
         badgeView.isHidden = badgeCount == 0
         badgeLabel.text = "\(badgeCount)"
         updateSellTitle()

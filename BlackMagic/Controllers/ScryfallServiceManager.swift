@@ -4,17 +4,7 @@ import Foundation
 // (предполагается, что файл ScryfallSet.swift находится в папке Models)
 // Если потребуется, используйте @testable import BlackMagic для тестов
 
-// Простая модель карты для демонстрации (расширяйте по необходимости)
-struct Card: Codable, CustomStringConvertible {
-    let name: String
-    let set: String?
-    let rarity: String?
-    let image_uris: [String: String]?
-    
-    var description: String {
-        "Card(name: \(name), set: \(set ?? "-"), rarity: \(rarity ?? "-"))"
-    }
-}
+// import Card из Models/Card.swift
 
 class ScryfallServiceManager {
     // Синглтон для удобного доступа

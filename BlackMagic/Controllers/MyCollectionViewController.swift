@@ -7,31 +7,24 @@
 
 
 import UIKit
+import Foundation
 
 final class MyCollectionViewController: UIViewController {
 
     private let balanceButton = BalanceButton()
 
     private var collectionView: UICollectionView!
-
     private var cardData: [Card] = [
-        Card(id: 1, imageName: "Betor, Kin to All", price: 2.71, badgeCount: 1),
-        Card(id: 2, imageName: "Magmatic Hellkite", price: 0.36, badgeCount: 2),
-        Card(id: 3, imageName: "Roiling Dragonstorm", price: 0.12, badgeCount: 4),
-        Card(id: 4, imageName: "Synchronized Charge", price: 0.15, badgeCount: 3),
-        Card(id: 5, imageName: "Mardu Monument", price: 0.05, badgeCount: 1),
-        Card(id: 6, imageName: "Purging Stormbrood", price: 0.07, badgeCount: 3),
-        Card(id: 7, imageName: "Arashin Sunshield", price: 0.03, badgeCount: 1),
-        Card(id: 8, imageName: "Focus the Mind", price: 0.06, badgeCount: 3),
-        Card(id: 9, imageName: "Evolving Wilds", price: 0.10, badgeCount: 2)
+        Card(id: "1", name: "Betor, Kin to All", type_line: "Creature", mana_cost: "{2}{R}", oracle_text: "Flying, trample", rarity: "rare", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "2.71", count: 1),
+        Card(id: "2", name: "Magmatic Hellkite", type_line: "Creature", mana_cost: "{4}{R}{R}", oracle_text: "Flying, haste", rarity: "rare", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.36", count: 2),
+        Card(id: "3", name: "Roiling Dragonstorm", type_line: "Sorcery", mana_cost: "{5}{R}{R}", oracle_text: "Storm", rarity: "mythic", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.12", count: 4),
+        Card(id: "4", name: "Synchronized Charge", type_line: "Instant", mana_cost: "{2}{W}", oracle_text: "Creatures you control get +2/+1", rarity: "uncommon", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.15", count: 3),
+        Card(id: "5", name: "Mardu Monument", type_line: "Artifact", mana_cost: "{3}", oracle_text: "Add {R}, {W}, or {B}", rarity: "rare", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.05", count: 1),
+        Card(id: "6", name: "Purging Stormbrood", type_line: "Creature", mana_cost: "{3}{B}", oracle_text: "Deathtouch", rarity: "rare", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.07", count: 3),
+        Card(id: "7", name: "Arashin Sunshield", type_line: "Creature", mana_cost: "{1}{W}", oracle_text: "Vigilance", rarity: "common", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.03", count: 1),
+        Card(id: "8", name: "Focus the Mind", type_line: "Sorcery", mana_cost: "{U}", oracle_text: "Draw a card", rarity: "common", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.06", count: 3),
+        Card(id: "9", name: "Evolving Wilds", type_line: "Land", mana_cost: nil, oracle_text: "Search your library for a basic land card", rarity: "common", set: "TDM", set_name: "Test Set", image_url: nil, price_usd: "0.10", count: 2)
     ]
-
-    struct Card: Equatable {
-        let id: Int
-        let imageName: String
-        let price: Double
-        var badgeCount: Int
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,13 +60,13 @@ final class MyCollectionViewController: UIViewController {
         collectionView.pinBottom(to: view)
     }
 
-    private func sellCard(withId id: Int, count: Int) {
+    private func sellCard(withId id: String, count: Int) {
         guard let index = cardData.firstIndex(where: { $0.id == id }) else { return }
 
         var card = cardData[index]
-        card.badgeCount = max(card.badgeCount - count, 0)
+        card.count = max(card.count - count, 0)
 
-        if card.badgeCount == 0 {
+        if card.count == 0 {
             cardData.remove(at: index)
             collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
         } else {

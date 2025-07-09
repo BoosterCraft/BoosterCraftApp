@@ -24,7 +24,7 @@ class UserDataManager {
             return collection
         }
         // Если данных нет, возвращаем пустую коллекцию
-        return UserCollection(cardIDs: [])
+        return UserCollection(cards: [])
     }
     
     // Сохранить баланс пользователя

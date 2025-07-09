@@ -2,8 +2,8 @@ import Foundation
 
 // Модель для хранения коллекции пользователя
 struct UserCollection: Codable {
-    // Массив идентификаторов карт (например, имена или id карт Scryfall)
-    var cardIDs: [String]
+    // Коллекция карт пользователя
+    var cards: [Card]
 }
 
 // Модель для хранения баланса пользователя
