@@ -96,7 +96,7 @@ final class BoosterOpenedViewController: UIViewController {
         collectionView.clipsToBounds = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(OpenBoosterCardCell.self, forCellWithReuseIdentifier: OpenBoosterCardCell.identifier)
+        collectionView.register(CardCell.self, forCellWithReuseIdentifier: CardCell.identifier)
 
         view.addSubview(collectionView)
         collectionView.pinTop(to: totalLabel.bottomAnchor, 8)
@@ -157,17 +157,26 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: OpenBoosterCardCell.identifier,
+            withReuseIdentifier: CardCell.identifier,
             for: indexPath
-        ) as! OpenBoosterCardCell
+        ) as! CardCell
 
         let booster = boosterData[indexPath.item]
-        cell.cardView.configure(
+        // Преобразуем UserBooster в Card (заполняем тестовыми данными)
+        let card = Card(
+            id: UUID().uuidString,
+            name: booster.setCode, // временно используем setCode как имя
+            type_line: booster.type.rawValue,
+            mana_cost: nil,
+            oracle_text: nil,
+            rarity: nil,
             set: booster.setCode,
-            type: booster.type.rawValue,
-            count: 1,
-            color: UIColor.fromHexString(booster.colorHex ?? "") ?? .systemBlue
+            set_name: nil,
+            image_url: nil,
+            price_usd: nil,
+            count: 1
         )
+        cell.configure(with: card)
         return cell
     }
 
