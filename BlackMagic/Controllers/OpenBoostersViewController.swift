@@ -19,14 +19,18 @@ final class OpenBoostersViewController: UIViewController {
         setupNavigationBar(balanceButton, title: "Open boosters")
         setupCollectionView()
         reloadBoosters()
-        // Подписываемся на уведомление о покупке бустера
-        NotificationCenter.default.addObserver(self, selector: #selector(handleBoosterPurchase), name: .didPurchaseBooster, object: nil)
     }
 
     // MARK: Обновление баланса
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         balanceButton.updateBalance()
+    }
+    
+    // Обновляем бустеры при каждом появлении экрана
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadBoosters()
     }
     
     private func setupCollectionView() {
@@ -84,14 +88,10 @@ final class OpenBoostersViewController: UIViewController {
     private func presentBoosterOpenedViewController(for booster: UserBooster) {
         let openedVC = BoosterOpenedViewController()
         openedVC.booster = booster
+        openedVC.delegate = self
         let nav = UINavigationController(rootViewController: openedVC)
         nav.modalPresentationStyle = .automatic
         present(nav, animated: true)
-    }
-
-    // Обработка уведомления о покупке бустера
-    @objc private func handleBoosterPurchase() {
-        reloadBoosters()
     }
 
     deinit {
@@ -125,5 +125,12 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Selected booster: \(userBoosters[indexPath.item].type)")
+    }
+}
+
+// MARK: - BoosterOpenedViewControllerDelegate
+extension OpenBoostersViewController: BoosterOpenedViewControllerDelegate {
+    func didOpenBooster() {
+        reloadBoosters()
     }
 }

@@ -1,5 +1,10 @@
 import UIKit
 
+// Делегат для уведомления об открытии бустера
+protocol BoosterOpenedViewControllerDelegate: AnyObject {
+    func didOpenBooster()
+}
+
 final class BoosterOpenedViewController: UIViewController {
 
     // MARK: - Properties
@@ -15,6 +20,8 @@ final class BoosterOpenedViewController: UIViewController {
 
     // Выбранный бустер, который передаётся при открытии экрана
     var booster: UserBooster!
+
+    weak var delegate: BoosterOpenedViewControllerDelegate?
 
     private let bottomBarBackgroundView: UIView = {
         let view = UIView()
@@ -227,8 +234,31 @@ final class BoosterOpenedViewController: UIViewController {
         // Сохраняем оставшиеся карты в коллекцию пользователя
         saveRemainingCardsToCollection()
         
+        // Удаляем один бустер этого типа из пользовательских данных
+        removeOneOpenedBoosterFromUserData()
+        
+        // Уведомляем делегата об открытии бустера
+        delegate?.didOpenBooster()
+        
         // Закрываем экран
         dismiss(animated: true)
+    }
+    
+    /// Удаляет один бустер этого типа из UserDefaults
+    private func removeOneOpenedBoosterFromUserData() {
+        // Загружаем текущие неоткрытые бустеры пользователя
+        var userBoosters = UserDataManager.shared.loadUnopenedBoosters().boosters
+        
+        // Ищем индекс первого бустера с совпадающим setCode и type
+        if let index = userBoosters.firstIndex(where: { $0.setCode == booster.setCode && $0.type == booster.type }) {
+            // Удаляем найденный бустер
+            userBoosters.remove(at: index)
+            print("[BoosterOpenedViewController] Удалён один бустер типа \(booster.type) из сета \(booster.setCode)")
+        } else {
+            print("[BoosterOpenedViewController] Не найден бустер для удаления (setCode: \(booster.setCode), type: \(booster.type))")
+        }
+        // Сохраняем обновлённый список бустеров
+        UserDataManager.shared.saveUnopenedBoosters(UserBoosters(boosters: userBoosters))
     }
     
     private func saveRemainingCardsToCollection() {
@@ -257,10 +287,7 @@ final class BoosterOpenedViewController: UIViewController {
         for (index, card) in cards.enumerated() {
             print("[BoosterOpenedViewController] 💾 Сохранена карта \(index + 1): \(card.name) (ID: \(card.id))")
         }
-        
-        // Отправляем уведомление о том, что коллекция обновлена (бустер открыт)
-        NotificationCenter.default.post(name: .didOpenBooster, object: nil)
-    }
+}
     
     @objc private func handleSellSelectedTapped() {
         guard !selectedCards.isEmpty else { return }
