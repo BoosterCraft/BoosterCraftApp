@@ -22,6 +22,17 @@ final class MyCollectionViewController: UIViewController {
         setupNavigationBar(balanceButton, title: "My collection")
         setupCollectionView()
         loadSavedCollection()
+        // Подписываемся на уведомление об открытии бустера
+        NotificationCenter.default.addObserver(self, selector: #selector(handleBoosterOpened), name: .didOpenBooster, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - Обработка уведомления об открытии бустера
+    @objc private func handleBoosterOpened() {
+        loadSavedCollection()
     }
     
     // MARK: - Загрузка сохраненной коллекции
@@ -35,8 +46,8 @@ final class MyCollectionViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         balanceButton.updateBalance()
-        // Перезагружаем коллекцию при возвращении на экран
-        loadSavedCollection()
+        // Удаляем автоматическую перезагрузку коллекции
+        // loadSavedCollection()
     }
 
     
@@ -116,5 +127,10 @@ extension MyCollectionViewController: UICollectionViewDataSource, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         (collectionView.cellForItem(at: indexPath) as? CardCell)?.flip()
     }
+}
+
+// MARK: - Notification.Name Extension
+extension Notification.Name {
+    static let didOpenBooster = Notification.Name("didOpenBooster")
 }
 

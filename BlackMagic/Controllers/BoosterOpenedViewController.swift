@@ -257,6 +257,9 @@ final class BoosterOpenedViewController: UIViewController {
         for (index, card) in cards.enumerated() {
             print("[BoosterOpenedViewController] 💾 Сохранена карта \(index + 1): \(card.name) (ID: \(card.id))")
         }
+        
+        // Отправляем уведомление о том, что коллекция обновлена (бустер открыт)
+        NotificationCenter.default.post(name: .didOpenBooster, object: nil)
     }
     
     @objc private func handleSellSelectedTapped() {
