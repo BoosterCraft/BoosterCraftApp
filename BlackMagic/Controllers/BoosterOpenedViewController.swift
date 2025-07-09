@@ -10,6 +10,9 @@ final class BoosterOpenedViewController: UIViewController {
     // Массив реальных карт, полученных из Scryfall
     private var cards: [Card] = []
 
+    // Выбранный бустер, который передаётся при открытии экрана
+    var booster: UserBooster!
+
     private let bottomBarBackgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.15, alpha: 1)
@@ -28,19 +31,6 @@ final class BoosterOpenedViewController: UIViewController {
     private let sellSelectedButton = BoosterOpenedViewController.makeButton(title: "Sell selected", bgColor: .systemGray)
     private let keepAllButton = BoosterOpenedViewController.makeButton(title: "Keep all", bgColor: .systemBlue)
 
-    private var boosterData: [UserBooster] = [
-        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
-        UserBooster(setCode: "OTJ", type: .collector, color: .systemOrange),
-        UserBooster(setCode: "WOE", type: .play, color: .purple),
-        UserBooster(setCode: "NEO", type: .play, color: .systemPink),
-        UserBooster(setCode: "ABC", type: .play, color: .systemGreen),
-        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
-        UserBooster(setCode: "TDM", type: .play, color: .systemTeal),
-        UserBooster(setCode: "WOE", type: .play, color: .purple),
-        UserBooster(setCode: "XYZ", type: .play, color: .systemRed),
-        UserBooster(setCode: "NEO", type: .play, color: .systemPink)
-    ]
-
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -48,23 +38,24 @@ final class BoosterOpenedViewController: UIViewController {
         view.backgroundColor = .black
         isModalInPresentation = true
         setupUI()
-        // Загружаем карты для первого бустера (или любого нужного сета)
-        if let firstBooster = boosterData.first {
-            // Выводим в консоль код сета
-            print("[BoosterOpenedViewController] Загружаем карты для сета: \(firstBooster.setCode)")
-            ScryfallServiceManager.shared.fetchCards(forSet: firstBooster.setCode) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let fetchedCards):
-                        self?.cards = fetchedCards
-                        // Печатаем все image_url в консоль
-                        for card in fetchedCards {
-                            print("[BoosterOpenedViewController] image_url: \(card.image_url ?? "nil") for card: \(card.name)")
-                        }
-                        self?.collectionView.reloadData()
-                    case .failure(let error):
-                        print("[BoosterOpenedViewController] Ошибка загрузки карт: \(error)")
+        // Загружаем карты для выбранного бустера
+        guard let booster = booster else {
+            print("[BoosterOpenedViewController] Ошибка: booster не передан!")
+            return
+        }
+        print("[BoosterOpenedViewController] Загружаем карты для сета: \(booster.setCode)")
+        ScryfallServiceManager.shared.fetchCards(forSet: booster.setCode) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let fetchedCards):
+                    self?.cards = fetchedCards
+                    // Печатаем все image_url в консоль
+                    for card in fetchedCards {
+                        print("[BoosterOpenedViewController] image_url: \(card.image_url ?? "nil") for card: \(card.name)")
                     }
+                    self?.collectionView.reloadData()
+                case .failure(let error):
+                    print("[BoosterOpenedViewController] Ошибка загрузки карт: \(error)")
                 }
             }
         }
@@ -151,8 +142,8 @@ final class BoosterOpenedViewController: UIViewController {
     // MARK: - Utilities
 
     private func updateStatsLabel() {
-        let totalCards = boosterData.count
-        let totalPrice = (0..<boosterData.count).map { _ in Double.random(in: 0.01...3.5) }.reduce(0, +)
+        let totalCards = cards.count
+        let totalPrice = (0..<cards.count).map { _ in Double.random(in: 0.01...3.5) }.reduce(0, +)
         totalLabel.text = "Total cards: \(totalCards)     Total price: $\(String(format: "%.2f", totalPrice))"
     }
 
@@ -193,6 +184,6 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Selected booster: \(boosterData[indexPath.item].type)")
+        print("Selected booster: \(booster.type)")
     }
 }

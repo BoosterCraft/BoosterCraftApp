@@ -81,8 +81,9 @@ final class OpenBoostersViewController: UIViewController {
         groupedBoosters = Array(grouped.values)
     }
 
-    private func presentBoosterOpenedViewController() {
+    private func presentBoosterOpenedViewController(for booster: UserBooster) {
         let openedVC = BoosterOpenedViewController()
+        openedVC.booster = booster
         let nav = UINavigationController(rootViewController: openedVC)
         nav.modalPresentationStyle = .automatic
         present(nav, animated: true)
@@ -115,7 +116,10 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
             color: UIColor.fromHexString(booster.colorHex ?? "") ?? .systemBlue
         )
         cell.onOpenTapped = { [weak self] in
-            self?.presentBoosterOpenedViewController()
+            let (booster, _) = self?.groupedBoosters[indexPath.item] ?? (nil, 0)
+            if let booster = booster {
+                self?.presentBoosterOpenedViewController(for: booster)
+            }
         }
         return cell
     }
