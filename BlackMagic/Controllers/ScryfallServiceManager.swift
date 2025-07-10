@@ -204,7 +204,7 @@ private struct ScryfallCard: Codable {
             rarity: rarity,
             set: set,
             set_name: set_name,
-            image_url: image_uris?["normal"],
+            image_url: image_uris?["large"],
             price_usd: prices?["usd"] ?? nil,
             count: 1
         )

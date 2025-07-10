@@ -107,7 +107,6 @@ final class DailyRewardViewController: UIViewController {
         if lastDate != nil && Calendar.current.compare(today, to: lastDate!, toGranularity: .day) == .orderedSame {
             rewardButton.isEnabled = false
             rewardButton.backgroundColor = .systemGray
-            rewardButton.setTitle("Award received", for: .normal)
         } else {
             rewardButton.isEnabled = true
             rewardButton.backgroundColor = .systemGreen
