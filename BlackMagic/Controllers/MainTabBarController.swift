@@ -24,7 +24,7 @@ class MainTabBarController: UITabBarController {
         
             guard !hasCompletedOnboarding else { return }
     
-            let title: NSString = "Welcome to Black Magic"
+            let title: NSString = "Welcome to BoosterCraft"
             let detailText: NSString = ""
             let welcomeController = OBWelcomeController(title: title, detailText: detailText, symbolName: "wand.and.stars")
             
