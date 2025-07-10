@@ -152,10 +152,11 @@ final class OpenBoosterCardView: UIView {
     }
     
     // MARK: - Public Configuration
-    
-    func configure(set: String, type: String, count: Int, color: UIColor) {
+    /// Конфигурирует отображение бустера (цвет и цвет текста для setLabel)
+    func configure(set: String, type: String, count: Int, color: UIColor, textColor: UIColor) {
         setLabel.text = set
         setLabel.backgroundColor = color
+        setLabel.textColor = textColor // Цвет текста для setLabel
         typeLabel.text = type
         boosterLabel.text = "booster"
         badgeLabel.text = "\(count)"

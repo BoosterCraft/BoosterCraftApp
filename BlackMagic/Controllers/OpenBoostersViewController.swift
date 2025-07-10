@@ -19,7 +19,7 @@ final class OpenBoostersViewController: UIViewController {
         setupNavigationBar(balanceButton, title: "Open boosters")
         setupCollectionView()
         // Устанавливаем стартовый баланс при первом открытии экрана
-        setInitialBalanceIfNeeded()
+//        setInitialBalanceIfNeeded()
         reloadBoosters()
     }
 
@@ -123,11 +123,16 @@ extension OpenBoostersViewController: UICollectionViewDataSource, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OpenBoosterCardCell.identifier, for: indexPath) as! OpenBoosterCardCell
         let (booster, count) = groupedBoosters[indexPath.item]
+        // Используем тот же цвет, что и titleLabel.backgroundColor в BoosterCardView
+        print(booster.setCode)
+        let setColor = MainViewController.getTitleBackgroundColor(forSetCode: booster.setCode)
+        let setTextColor = MainViewController.getTitleTextColor(forSetCode: booster.setCode)
         cell.cardView.configure(
             set: booster.setCode,
             type: booster.type.rawValue,
             count: count,
-            color: UIColor.fromHexString(booster.colorHex ?? "") ?? .systemBlue
+            color: setColor,
+            textColor: setTextColor
         )
         cell.onOpenTapped = { [weak self] in
             let (booster, _) = self?.groupedBoosters[indexPath.item] ?? (nil, 0)

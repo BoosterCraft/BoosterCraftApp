@@ -8,12 +8,23 @@ final class DailyRewardViewController: UIViewController {
     // Кнопка для получения награды
     private let rewardButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Получить ежедневную награду (+500)", for: .normal)
+        button.setTitle("Get Daily Reward (+500)", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.backgroundColor = .systemGreen
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12
         button.contentEdgeInsets = UIEdgeInsets(top: 12, left: 24, bottom: 12, right: 24)
+        return button
+    }()
+    // Кнопка для удаления истории транзакций
+    private let deleteHistoryButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Clear history", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        button.backgroundColor = .systemRed
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 10
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
         return button
     }()
     // Таблица для истории транзакций
@@ -45,17 +56,22 @@ final class DailyRewardViewController: UIViewController {
 
     private func setupUI() {
         view.addSubview(rewardButton)
+        view.addSubview(deleteHistoryButton)
         view.addSubview(tableView)
         rewardButton.translatesAutoresizingMaskIntoConstraints = false
+        deleteHistoryButton.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         // Пин-код через pin-методы
         rewardButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 24)
         rewardButton.pinCenterX(to: view)
-        tableView.pinTop(to: rewardButton.bottomAnchor, 24)
+        deleteHistoryButton.pinTop(to: rewardButton.bottomAnchor, 16)
+        deleteHistoryButton.pinCenterX(to: view)
+        tableView.pinTop(to: deleteHistoryButton.bottomAnchor, 16)
         tableView.pinLeft(to: view)
         tableView.pinRight(to: view)
         tableView.pinBottom(to: view)
         rewardButton.addTarget(self, action: #selector(handleReward), for: .touchUpInside)
+        deleteHistoryButton.addTarget(self, action: #selector(handleDeleteHistory), for: .touchUpInside)
         tableView.dataSource = self
         tableView.register(TransactionCell.self, forCellReuseIdentifier: "TransactionCell")
         tableView.backgroundColor = .clear
@@ -105,6 +121,18 @@ final class DailyRewardViewController: UIViewController {
     }
     private func saveTransaction(_ transaction: Transaction) {
         UserDataManager.shared.addTransactionAndUpdateBalance(transaction)
+    }
+
+    // MARK: - Удаление истории транзакций
+    @objc private func handleDeleteHistory() {
+        let alert = UIAlertController(title: "Clear history?", message: "Are you sure you want to delete all transactions? This action cannot be undone.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
+            UserDataManager.shared.clearAllTransactions()
+            self.loadTransactions()
+            self.tableView.reloadData()
+        })
+        present(alert, animated: true)
     }
 }
 

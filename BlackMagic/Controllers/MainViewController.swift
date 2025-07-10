@@ -345,6 +345,62 @@ extension MainViewController: UIScrollViewDelegate {
     }
 }
 
+// MARK: - Set Color Mapping
+
+extension MainViewController {
+    // Централизованное сопоставление цветов для сетов
+    static func getColorForSetCode(_ setCode: String) -> UIColor {
+        let colorMapping: [String: UIColor] = [
+            "TDM": UIColor(red: 255, green: 255, blue: 255), // Final Fantasy - белый
+            "TDR": UIColor(red: 219, green: 240, blue: 252), // Tarkir: dragonstorm - голубой
+            "AED": UIColor(red: 253, green: 185, blue: 1),   // AETHERDRIFT - желтый
+            "DSK": UIColor(red: 157, green: 203, blue: 185), // Duskmourn: house of horror - зеленый
+            "BLB": UIColor(red: 10, green: 107, blue: 61)    // bloomburrow - темно-зеленый
+        ]
+        
+        return colorMapping[setCode] ?? .gray // Возвращаем серый цвет по умолчанию
+    }
+}
+
+// MARK: - Set Title Background Color Mapping
+extension MainViewController {
+    /// Возвращает цвет фона для titleLabel по коду сета (как в BoosterCardView)
+    static func getTitleBackgroundColor(forSetCode setCode: String) -> UIColor {
+        switch setCode.lowercased() {
+        case "dsk": // Duskmourn: house of horror
+            return UIColor(red: 157/255, green: 203/255, blue: 185/255, alpha: 1) // зелёный
+        case "tdm": // Duskmourn: Final Terror (пример)
+            return UIColor(red: 219/255, green: 240/255, blue: 252/255, alpha: 1) // голубой
+        case "fin": // Final Fantasy
+            return UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1) // белый
+        case "dft": // Tarkir: dragonstorm
+            return UIColor(red: 253/255, green: 185/255, blue: 1/255, alpha: 1) // жёлтый
+        case "blb": // bloomburrow
+            return UIColor(red: 10/255, green: 107/255, blue: 61/255, alpha: 1) // тёмно-зелёный
+        default:
+            return .systemGray // Цвет по умолчанию
+        }
+    }
+}
+
+// MARK: - Set Title Text Color Mapping
+extension MainViewController {
+    /// Возвращает цвет текста для titleLabel по коду сета (как в BoosterCardView)
+    static func getTitleTextColor(forSetCode setCode: String) -> UIColor {
+        switch setCode.lowercased() {
+        case "blb": // bloomburrow
+            return UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1) // белый
+        default:
+            return UIColor(red: 28/255, green: 28/255, blue: 28/255, alpha: 1) // почти чёрный
+        }
+    }
+}
+//dsk
+//dft
+//fin
+//tdm
+//blb
+
 extension Notification.Name {
     static let didPurchaseBooster = Notification.Name("didPurchaseBooster")
 }
