@@ -237,7 +237,7 @@ class BoosterCardView: UIView {
         guard let setCode = purchaseSetCode else { return }
         let type: UserBooster.BoosterType = segmentedControl.selectedSegmentIndex == 0 ? .play : .collector
         let quantity = Int(quantityStepper.value)
-        let color = backTitleLabel.backgroundColor // Можно заменить на нужный цвет
+        let color = MainViewController.getColorForSetCode(setCode) // Получаем цвет для кода сета
         let info = BoosterPurchaseInfo(setCode: setCode, type: type, quantity: quantity, color: color)
         onBuyTapped?(info)
     }

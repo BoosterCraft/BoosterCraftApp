@@ -28,9 +28,9 @@ extension UIColor {
         }
         switch rarity {
         case "common":
-            return UIColor(red: 160, green: 160, blue: 160) // Серый
+            return UIColor(red: 85, green: 180, blue: 120) // Серый
         case "uncommon":
-            return UIColor(red: 85, green: 180, blue: 120) // Зеленый
+            return UIColor(red: 160, green: 160, blue: 160) // Зеленый
         case "rare":
             return UIColor(red: 255, green: 215, blue: 0) // Золотой
         case "mythic":
