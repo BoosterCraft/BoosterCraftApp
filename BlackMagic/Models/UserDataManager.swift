@@ -73,4 +73,11 @@ class UserDataManager {
     func loadTransactions() -> [Transaction] {
         return loadBalance().transactions.sorted { $0.date > $1.date }
     }
+
+    // Очистить всю историю транзакций пользователя
+    func clearAllTransactions() {
+        var balance = loadBalance()
+        balance.transactions.removeAll()
+        saveBalance(balance)
+    }
 } 
