@@ -67,10 +67,13 @@ class ScryfallServiceManager {
                 let allSets = setsResponse.data
                 // Получаем текущую дату
                 let now = Date()
-                let dateFormatter = ISO8601DateFormatter()
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                 // Фильтруем по условиям
                 let filtered = allSets.filter { set in
-                    set.set_type == "expansion" &&
+                    print((dateFormatter.date(from: set.released_at) ?? Date.distantPast))
+                    return set.set_type == "expansion" &&
                     set.card_count >= 150 &&
                     (dateFormatter.date(from: set.released_at) ?? Date.distantPast) < now
                 }
