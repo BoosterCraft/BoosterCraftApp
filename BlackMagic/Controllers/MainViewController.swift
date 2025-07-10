@@ -200,7 +200,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate {
                 case .success(let sets):
                     for (i, set) in sets.prefix(self?.boosterCardsData.count ?? 0).enumerated() {
                         self?.boosterCardsData[i].set = set
-                        self?.boosterCardsData[i].price = "$50"
+                        self?.boosterCardsData[i].price = "$6.51"
                     }
                     self?.boosterCollectionView.reloadData()
                 case .failure(let error):

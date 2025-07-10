@@ -8,7 +8,7 @@ final class DailyRewardViewController: UIViewController {
     // Кнопка для получения награды
     private let rewardButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Get Daily Reward (+500)", for: .normal)
+        button.setTitle("Get Daily Reward (+20)", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.backgroundColor = .systemGreen
         button.setTitleColor(.white, for: .normal)
@@ -110,7 +110,7 @@ final class DailyRewardViewController: UIViewController {
         } else {
             rewardButton.isEnabled = true
             rewardButton.backgroundColor = .systemGreen
-            rewardButton.setTitle("Get daily reward (+500)", for: .normal)
+            rewardButton.setTitle("Get daily reward (+20)", for: .normal)
         }
     }
 

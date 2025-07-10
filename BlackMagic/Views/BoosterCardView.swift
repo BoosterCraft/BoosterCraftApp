@@ -36,7 +36,7 @@ class BoosterCardView: UIView {
          buttonTextColor: UIColor,
          titleFontSize: Int,
          set: ScryfallSet,
-         price: String = "$50")
+         price: String = "$6.51")
     {
         super.init(frame: .zero)
         setupViews()
