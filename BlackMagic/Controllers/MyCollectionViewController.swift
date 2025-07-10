@@ -133,7 +133,7 @@ final class MyCollectionViewController: UIViewController {
         UserDataManager.shared.saveCollection(updatedCollection)
         // Создаём транзакцию и обновляем баланс централизованно
         let amount = Double(count) * (Double(card.price_usd ?? "0") ?? 0)
-        let tx = Transaction(type: .sellCard, amount: amount, date: Date(), details: "Продажа карты: \(card.name)")
+        let tx = Transaction(type: .sellCard, amount: amount, date: Date(), details: "Sold card: \(card.name)")
         UserDataManager.shared.addTransactionAndUpdateBalance(tx)
         // Обновляем UI и коллекцию
         collectionView.performBatchUpdates({

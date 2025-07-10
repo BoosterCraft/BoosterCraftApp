@@ -223,8 +223,8 @@ class BoosterCardView: UIView {
     @objc private func stepperChanged() {
         quantityLabel.text = "\(Int(quantityStepper.value))"
         // Обновляем цену на кнопке
-        let price = Int(quantityStepper.value) * 50
-        priceButton.setTitle("Buy for $\(price)", for: .normal)
+        let price = Double(quantityStepper.value) * 6.51
+        priceButton.setTitle("Buy for $\(String(format: "%.2f", price))", for: .normal)
     }
 
     // Метод для конфигурирования кода сета

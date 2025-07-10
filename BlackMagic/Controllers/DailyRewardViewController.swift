@@ -88,7 +88,7 @@ final class DailyRewardViewController: UIViewController {
             return
         }
         // Создаём транзакцию и обновляем баланс централизованно
-        let transaction = Transaction(type: .dailyReward, amount: 500, date: Date(), details: "Daily Reward")
+        let transaction = Transaction(type: .dailyReward, amount: 20, date: Date(), details: "Daily Reward")
         UserDataManager.shared.addTransactionAndUpdateBalance(transaction)
         // Сохраняем дату получения награды
         UserDefaults.standard.set(today, forKey: lastRewardKey)

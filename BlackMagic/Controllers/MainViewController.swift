@@ -265,7 +265,7 @@ extension MainViewController: UICollectionViewDataSource {
         // Обработка покупки
         cardView.onBuyTapped = { [weak self] (purchaseInfo: BoosterPurchaseInfo) in
             guard let self = self else { return }
-            let price = purchaseInfo.quantity * 50
+            let price = Double(purchaseInfo.quantity) * 6.51
             let balance = UserDataManager.shared.loadBalance()
             if balance.coins >= Double(price) {
                 // Достаточно средств
