@@ -266,11 +266,11 @@ extension MainViewController: UICollectionViewDataSource {
         cardView.onBuyTapped = { [weak self] (purchaseInfo: BoosterPurchaseInfo) in
             guard let self = self else { return }
             let price = purchaseInfo.quantity * 50
-            var balance = UserDataManager.shared.loadBalance()
+            let balance = UserDataManager.shared.loadBalance()
             if balance.coins >= Double(price) {
                 // Достаточно средств
-                balance.coins -= Double(price)
-                UserDataManager.shared.saveBalance(balance)
+                let tx = Transaction(type: .buyBooster, amount: -Double(price), date: Date(), details: "Покупка бустера: \(purchaseInfo.setCode) x\(purchaseInfo.quantity)")
+                UserDataManager.shared.addTransactionAndUpdateBalance(tx)
                 self.balanceButton.updateBalance()
                 // Сохраняем купленные бустеры
                 var userBoosters = UserDataManager.shared.loadUnopenedBoosters()
@@ -284,7 +284,7 @@ extension MainViewController: UICollectionViewDataSource {
                 }
                 UserDataManager.shared.saveUnopenedBoosters(userBoosters)
                 // Логируем информацию о покупке
-                print("[Покупка] Куплено: сет=\(purchaseInfo.setCode), тип=\(purchaseInfo.type.rawValue), количество=\(purchaseInfo.quantity), новый баланс=\(balance.coins)")
+                print("[Покупка] Куплено: сет=\(purchaseInfo.setCode), тип=\(purchaseInfo.type.rawValue), количество=\(purchaseInfo.quantity), новый баланс=\(UserDataManager.shared.loadBalance().coins)")
                 // Логируем все бустеры пользователя
                 let allBoosters = UserDataManager.shared.loadUnopenedBoosters().boosters
                 print("[Бустеры пользователя] Всего: \(allBoosters.count)")

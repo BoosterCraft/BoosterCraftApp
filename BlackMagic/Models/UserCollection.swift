@@ -10,4 +10,6 @@ struct UserCollection: Codable {
 struct UserBalance: Codable {
     // Баланс (например, количество монет)
     var coins: Double
+    // История транзакций пользователя
+    var transactions: [Transaction] = []
 } 

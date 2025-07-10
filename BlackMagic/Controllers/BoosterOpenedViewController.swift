@@ -294,49 +294,40 @@ final class BoosterOpenedViewController: UIViewController {
     
     @objc private func handleSellSelectedTapped() {
         guard !selectedCards.isEmpty else { return }
-        
         print("[BoosterOpenedViewController] Пользователь продает \(selectedCards.count) выбранных карт")
-        
         // Анимированно удаляем выбранные карты
         let selectedIndices = cards.enumerated().compactMap { index, card in
             selectedCards.contains(card.id) ? index : nil
         }.sorted(by: >) // Сортируем в обратном порядке для корректного удаления
-        
         // Считаем сумму продажи выбранных карт
         var saleValue: Double = 0
+        var soldNames: [String] = []
         for index in selectedIndices {
             let removedCard = cards.remove(at: index)
             if let priceString = removedCard.price_usd, let price = Double(priceString) {
                 saleValue += price
             }
+            soldNames.append(removedCard.name)
             print("[BoosterOpenedViewController] 🗑️ Продана карта: \(removedCard.name)")
         }
-        
         // Очищаем выбранные карты
         selectedCards.removeAll()
-        
-        // Обновляем баланс пользователя
+        // Обновляем баланс пользователя и записываем транзакцию
         if saleValue > 0 {
-            var balance = UserDataManager.shared.loadBalance()
-            balance.coins += saleValue
-            UserDataManager.shared.saveBalance(balance)
-            // Уведомляем другие экраны об изменении баланса
+            let tx = Transaction(type: .sellCard, amount: saleValue, date: Date(), details: "Продажа карт: \(soldNames.joined(separator: ", "))")
+            UserDataManager.shared.addTransactionAndUpdateBalance(tx)
             NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
         }
-        
         // Обновляем UI с анимацией
         UIView.animate(withDuration: 0.3) {
             self.collectionView.reloadData()
             self.updateStatsLabel()
             self.updateSellSelectedButton()
         }
-        
         print("[BoosterOpenedViewController] Осталось карт: \(cards.count)")
     }
-    
     @objc private func handleSellAllTapped() {
         print("[BoosterOpenedViewController] Пользователь продает все \(cards.count) карт")
-        
         // Считаем сумму продажи всех карт
         let saleValue: Double = cards.compactMap { card in
             if let priceString = card.price_usd, let price = Double(priceString) {
@@ -344,26 +335,21 @@ final class BoosterOpenedViewController: UIViewController {
             }
             return nil
         }.reduce(0, +)
-        
+        let soldNames = cards.map { $0.name }
         // Анимированно удаляем все карты
         cards.removeAll()
         selectedCards.removeAll()
-        
-        // Обновляем баланс пользователя
+        // Обновляем баланс пользователя и записываем транзакцию
         if saleValue > 0 {
-            var balance = UserDataManager.shared.loadBalance()
-            balance.coins += saleValue
-            UserDataManager.shared.saveBalance(balance)
-            // Уведомляем другие экраны об изменении баланса
+            let tx = Transaction(type: .sellCard, amount: saleValue, date: Date(), details: "Продажа всех карт: \(soldNames.joined(separator: ", "))")
+            UserDataManager.shared.addTransactionAndUpdateBalance(tx)
             NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
         }
-        
         UIView.animate(withDuration: 0.3) {
             self.collectionView.reloadData()
             self.updateStatsLabel()
             self.updateSellSelectedButton()
         }
-        
         print("[BoosterOpenedViewController] Все карты проданы, коллекция пуста")
     }
 

@@ -100,25 +100,55 @@ final class MyCollectionViewController: UIViewController {
 
     // MARK: - Продажа карт
     private func sellCard(withId id: String, count: Int) {
-        guard let index = cardData.firstIndex(where: { $0.id == id }) else { return }
-
-        var card = cardData[index]
+        // Находим секцию и индекс карточки в секции
+        guard let sectionIndex = cardsBySet.firstIndex(where: { $0.cards.contains(where: { $0.id == id }) }),
+              let itemIndex = cardsBySet[sectionIndex].cards.firstIndex(where: { $0.id == id }) else { return }
+        var card = cardsBySet[sectionIndex].cards[itemIndex]
         card.count = max(card.count - count, 0)
-
-        if card.count == 0 {
-            cardData.remove(at: index)
-            collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
-        } else {
-            cardData[index] = card
-            collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
+        // Обновляем cardData (основной массив)
+        if let flatIndex = cardData.firstIndex(where: { $0.id == id }) {
+            if card.count == 0 {
+                cardData.remove(at: flatIndex)
+            } else {
+                cardData[flatIndex] = card
+            }
         }
-        
+        // Обновляем cardsBySet
+        var sectionCards = cardsBySet[sectionIndex].cards
+        if card.count == 0 {
+            sectionCards.remove(at: itemIndex)
+        } else {
+            sectionCards[itemIndex] = card
+        }
+        // Если секция опустела, удаляем секцию
+        var shouldDeleteSection = false
+        if sectionCards.isEmpty {
+            cardsBySet.remove(at: sectionIndex)
+            shouldDeleteSection = true
+        } else {
+            cardsBySet[sectionIndex].cards = sectionCards
+        }
         // Сохраняем обновленную коллекцию
         let updatedCollection = UserCollection(cards: cardData)
         UserDataManager.shared.saveCollection(updatedCollection)
-        
-        // Обновляем баланс (добавляем стоимость проданных карт)
-        updateBalanceAfterSale(card: card, soldCount: count)
+        // Создаём транзакцию и обновляем баланс централизованно
+        let amount = Double(count) * (Double(card.price_usd ?? "0") ?? 0)
+        let tx = Transaction(type: .sellCard, amount: amount, date: Date(), details: "Продажа карты: \(card.name)")
+        UserDataManager.shared.addTransactionAndUpdateBalance(tx)
+        // Обновляем UI и коллекцию
+        collectionView.performBatchUpdates({
+            if card.count == 0 {
+                if shouldDeleteSection {
+                    collectionView.deleteSections(IndexSet(integer: sectionIndex))
+                } else {
+                    collectionView.deleteItems(at: [IndexPath(item: itemIndex, section: sectionIndex)])
+                }
+            } else {
+                collectionView.reloadItems(at: [IndexPath(item: itemIndex, section: sectionIndex)])
+            }
+        }, completion: nil)
+        balanceButton.updateBalance()
+        NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
     }
     
     // MARK: - Обновление баланса после продажи

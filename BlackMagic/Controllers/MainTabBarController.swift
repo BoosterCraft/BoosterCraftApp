@@ -62,15 +62,18 @@ class MainTabBarController: UITabBarController {
         let mainVC = MainViewController()
         let boostersVC = OpenBoostersViewController()
         let collectionVC = MyCollectionViewController()
+        let dailyRewardVC = DailyRewardViewController() // Новая вкладка
         
         mainVC.tabBarItem = UITabBarItem(title: "Buy boosters", image: UIImage(systemName: "cart.fill"), tag: 0)
         boostersVC.tabBarItem = UITabBarItem(title: "Open boosters", image: UIImage(systemName: "gift.fill"), tag: 1)
         collectionVC.tabBarItem = UITabBarItem(title: "My collection", image: UIImage(systemName: "book.fill"), tag: 2)
+        dailyRewardVC.tabBarItem = UITabBarItem(title: "Daily Reward", image: UIImage(systemName: "star.fill"), tag: 3)
         
         viewControllers = [
             UINavigationController(rootViewController: boostersVC),
             UINavigationController(rootViewController: mainVC),
-            UINavigationController(rootViewController: collectionVC)
+            UINavigationController(rootViewController: collectionVC),
+            UINavigationController(rootViewController: dailyRewardVC) // Добавляем новую вкладку
         ]
         
         selectedIndex = 1

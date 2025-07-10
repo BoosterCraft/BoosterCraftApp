@@ -60,4 +60,17 @@ class UserDataManager {
         // Если данных нет, возвращаем пустой массив
         return UserBoosters(boosters: [])
     }
+
+    // Добавить транзакцию и обновить баланс пользователя
+    func addTransactionAndUpdateBalance(_ transaction: Transaction) {
+        var balance = loadBalance()
+        balance.coins += transaction.amount
+        balance.transactions.append(transaction)
+        saveBalance(balance)
+    }
+
+    // Получить историю транзакций пользователя
+    func loadTransactions() -> [Transaction] {
+        return loadBalance().transactions.sorted { $0.date > $1.date }
+    }
 } 
