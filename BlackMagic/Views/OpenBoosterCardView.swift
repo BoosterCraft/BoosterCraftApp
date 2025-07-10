@@ -29,9 +29,7 @@ final class OpenBoosterCardView: UIView {
         setupFront()
         setupBack()
         
-        addSubview(frontView)
-        addSubview(backView)
-        addSubview(badgeLabel) // badge added to self, not frontView
+        addSubviews(frontView, backView, badgeLabel)
         
         frontView.pin(to: self)
         backView.pin(to: self)

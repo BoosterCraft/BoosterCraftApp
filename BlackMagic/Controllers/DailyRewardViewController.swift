@@ -55,9 +55,7 @@ final class DailyRewardViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.addSubview(rewardButton)
-        view.addSubview(deleteHistoryButton)
-        view.addSubview(tableView)
+        view.addSubviews(rewardButton, deleteHistoryButton, tableView)
         rewardButton.translatesAutoresizingMaskIntoConstraints = false
         deleteHistoryButton.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
