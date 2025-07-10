@@ -13,6 +13,8 @@ final class MyCollectionViewController: UIViewController {
 
     private let balanceButton = BalanceButton()
 
+    // Группировка карт по сету: [set_name: [Card]]
+    private var cardsBySet: [(setName: String, cards: [Card])] = []
     private var collectionView: UICollectionView!
     private var cardData: [Card] = []
     private var expandedCardSnapshot: UIView? // Снапшот увеличенной карточки
@@ -43,6 +45,10 @@ final class MyCollectionViewController: UIViewController {
     private func loadSavedCollection() {
         let userCollection = UserDataManager.shared.loadCollection()
         cardData = userCollection.cards
+        // Группируем карты по сету (set_name)
+        let grouped = Dictionary(grouping: cardData) { $0.set_name ?? "Unknown Set" }
+        // Сортируем по имени сета
+        cardsBySet = grouped.keys.sorted().map { ($0, grouped[$0]!.sorted { $0.name < $1.name }) }
         collectionView.reloadData()
     }
     
@@ -78,6 +84,8 @@ final class MyCollectionViewController: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.clipsToBounds = false
         collectionView.register(CardCell.self, forCellWithReuseIdentifier: CardCell.identifier)
+        // Регистрируем header для секций
+        collectionView.register(SetHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "SetHeaderView")
         collectionView.dataSource = self
         collectionView.delegate = self
         view.addSubview(collectionView)
@@ -197,18 +205,39 @@ final class MyCollectionViewController: UIViewController {
 // MARK: - UICollectionViewDataSource & Delegate
 
 extension MyCollectionViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        // Количество секций = количество сетов
+        return cardsBySet.count
+    }
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        cardData.count
+        // Количество карт в секции
+        return cardsBySet[section].cards.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let card = cardData[indexPath.item]
+        let card = cardsBySet[indexPath.section].cards[indexPath.item]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CardCell.identifier, for: indexPath) as! CardCell
         cell.configure(with: card, showBadge: true)
         cell.onSell = { [weak self] sellCount in
             self?.sellCard(withId: card.id, count: sellCount)
         }
         return cell
+    }
+
+    // Добавляем заголовок секции с названием сета
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "SetHeaderView", for: indexPath) as! SetHeaderView
+            header.titleLabel.text = cardsBySet[indexPath.section].setName
+            return header
+        }
+        return UICollectionReusableView()
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        // Увеличиваем высоту заголовка секции для большего отступа
+        return CGSize(width: collectionView.bounds.width, height: 54)
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -220,5 +249,27 @@ extension MyCollectionViewController: UICollectionViewDataSource, UICollectionVi
 extension Notification.Name {
     static let didOpenBooster = Notification.Name("didOpenBooster")
     static let didUpdateBalance = Notification.Name("didUpdateBalance")
+}
+
+// MARK: - Заголовок секции для коллекции
+final class SetHeaderView: UICollectionReusableView {
+    let titleLabel = UILabel()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        // Используем кастомный шрифт PirataOne-Regular для заголовка секции
+        titleLabel.font = UIFont(name: "PirataOne-Regular", size: 26) ?? .boldSystemFont(ofSize: 22)
+        titleLabel.textColor = .white
+        titleLabel.textAlignment = .left
+        addSubview(titleLabel)
+        // Используем pin-методы вместо ручных constraints
+        titleLabel.pinLeft(to: self, 8)
+        titleLabel.pinRight(to: self, 8)
+        titleLabel.pinTop(to: self)
+        // Добавляем нижний отступ между заголовком и карточками
+        titleLabel.pinBottom(to: self, 16)
+        // Делаем фон полностью прозрачным
+        backgroundColor = .clear
+    }
+    required init?(coder: NSCoder) { fatalError() }
 }
 
