@@ -218,9 +218,20 @@ final class BoosterOpenedViewController: UIViewController {
     private func updateStatsLabel() {
         let totalCards = cards.count
         let selectedCount = selectedCards.count
-        let totalPrice = (0..<cards.count).map { _ in Double.random(in: 0.01...3.5) }.reduce(0, +)
-        let selectedPrice = (0..<selectedCount).map { _ in Double.random(in: 0.01...3.5) }.reduce(0, +)
-        
+        // Сумма по реальным ценам всех карт
+        let totalPrice = cards.compactMap { card in
+            if let priceString = card.price_usd, let price = Double(priceString) {
+                return price
+            }
+            return nil
+        }.reduce(0.0, +)
+        // Сумма по реальным ценам выбранных карт
+        let selectedPrice = cards.filter { selectedCards.contains($0.id) }.compactMap { card in
+            if let priceString = card.price_usd, let price = Double(priceString) {
+                return price
+            }
+            return nil
+        }.reduce(0.0, +)
         if selectedCount > 0 {
             totalLabel.text = "Selected: \(selectedCount) | Selected price: $\(String(format: "%.2f", selectedPrice))"
         } else {
