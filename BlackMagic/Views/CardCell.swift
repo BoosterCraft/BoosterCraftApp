@@ -66,6 +66,8 @@ final class CardCell: UICollectionViewCell {
         }
         badgeView.isHidden = !showBadge || badgeCount == 0
         badgeLabel.text = "\(badgeCount)"
+        // Устанавливаем цвет бейджа по редкости карты
+        badgeView.backgroundColor = UIColor.badgeColor(forRarity: card.rarity)
         updateSellTitle()
     }
 
