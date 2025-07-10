@@ -72,7 +72,7 @@ final class DailyRewardViewController: UIViewController {
             return
         }
         // Создаём транзакцию и обновляем баланс централизованно
-        let transaction = Transaction(type: .dailyReward, amount: 500, date: Date(), details: "Ежедневная награда")
+        let transaction = Transaction(type: .dailyReward, amount: 500, date: Date(), details: "Daily reward")
         UserDataManager.shared.addTransactionAndUpdateBalance(transaction)
         // Сохраняем дату получения награды
         UserDefaults.standard.set(today, forKey: lastRewardKey)
@@ -91,11 +91,11 @@ final class DailyRewardViewController: UIViewController {
         if lastDate != nil && Calendar.current.compare(today, to: lastDate!, toGranularity: .day) == .orderedSame {
             rewardButton.isEnabled = false
             rewardButton.backgroundColor = .systemGray
-            rewardButton.setTitle("Награда уже получена сегодня", for: .normal)
+            rewardButton.setTitle("Already received", for: .normal)
         } else {
             rewardButton.isEnabled = true
             rewardButton.backgroundColor = .systemGreen
-            rewardButton.setTitle("Получить ежедневную награду (+500)", for: .normal)
+            rewardButton.setTitle("Get daily reward (+500)", for: .normal)
         }
     }
 
