@@ -35,6 +35,7 @@ class OBWelcomeController {
         
 
         viewController = method(welcomeController, selector, title, detailText, nil)
+        viewController.overrideUserInterfaceStyle = .dark
     }
     
     // MARK: - Public Methods
