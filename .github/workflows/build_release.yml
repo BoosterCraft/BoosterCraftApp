@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to dev channel
         run: |  
-          curl -X POST "https://api.telegram.org/bot7573845312:AAGR9TaCcryqEkZBAgzhQ4ngX2mO2ab2LU4/sendDocument" \
+          curl -X POST "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendDocument" \
           -F chat_id=-4845306027 \
           -F document=@"upload/BlackMagic.ipa" 
  
