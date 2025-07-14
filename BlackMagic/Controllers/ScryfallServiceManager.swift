@@ -150,26 +150,47 @@ class ScryfallServiceManager {
         fetchPage(url: baseURL)
     }
 
-    // MARK: - Асинхронная загрузка изображения карты с логированием
-    func loadCardImage(from urlString: String?, completion: @escaping (UIImage?) -> Void) {
+    // MARK: - Асинхронная загрузка изображения карты с логированием и повторными попытками
+    /// Загружает изображение карты с повторными попытками (до 3 раз)
+    /// - Parameters:
+    ///   - urlString: URL изображения
+    ///   - retries: Количество оставшихся попыток (по умолчанию 3)
+    ///   - completion: Замыкание с изображением или nil
+    func loadCardImage(from urlString: String?, retries: Int = 3, completion: @escaping (UIImage?) -> Void) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
             self.log("Ошибка: некорректный URL изображения: \(urlString ?? "nil")")
             completion(nil as UIImage?)
             return
         }
         self.log("Начинаю загрузку изображения: \(url)")
-        URLSession.shared.dataTask(with: url) { data, _, error in
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
             if let error = error {
-                self.log("Ошибка загрузки изображения: \(error)")
-                completion(nil as UIImage?)
+                self?.log("Ошибка загрузки изображения: \(error)")
+                // Если есть попытки — пробуем ещё раз
+                if retries > 1 {
+                    self?.log("Повторная попытка загрузки изображения. Осталось попыток: \(retries-1)")
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+                        self?.loadCardImage(from: urlString, retries: retries-1, completion: completion)
+                    }
+                } else {
+                    completion(nil as UIImage?)
+                }
                 return
             }
             guard let data = data, let image = UIImage(data: data) else {
-                self.log("Ошибка: не удалось создать изображение из данных")
-                completion(nil as UIImage?)
+                self?.log("Ошибка: не удалось создать изображение из данных")
+                // Если есть попытки — пробуем ещё раз
+                if retries > 1 {
+                    self?.log("Повторная попытка загрузки изображения. Осталось попыток: \(retries-1)")
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+                        self?.loadCardImage(from: urlString, retries: retries-1, completion: completion)
+                    }
+                } else {
+                    completion(nil as UIImage?)
+                }
                 return
             }
-            self.log("Изображение успешно загружено: \(url)")
+            self?.log("Изображение успешно загружено: \(url)")
             completion(image)
         }.resume()
     }

@@ -23,6 +23,12 @@ final class BoosterOpenedViewController: UIViewController {
 
     weak var delegate: BoosterOpenedViewControllerDelegate?
 
+    // Флаг, указывающий на ошибку загрузки карт
+    private var cardLoadFailed = false
+
+    // Массив всех карт сета, полученных из Scryfall (для замены проблемных карт)
+    private var allFetchedCards: [Card] = []
+
     private let bottomBarBackgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.15, alpha: 1)
@@ -58,19 +64,26 @@ final class BoosterOpenedViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let fetchedCards):
-                    // Выбираем случайные 12 уникальных карт из набора (или меньше, если карт меньше 12)
+                    self?.allFetchedCards = fetchedCards
                     let count = min(12, fetchedCards.count)
                     let randomCards = Array(fetchedCards.shuffled().prefix(count))
                     self?.cards = randomCards
-                    // Печатаем все image_url выбранных карт в консоль
                     for card in randomCards {
                         print("[BoosterOpenedViewController] image_url: \(card.image_url ?? "nil") for card: \(card.name)")
                     }
+                    self?.cardLoadFailed = false
                     self?.collectionView.reloadData()
                     self?.updateStatsLabel()
                     self?.updateSellSelectedButton()
+                    self?.setActionButtonsEnabled(true)
                 case .failure(let error):
                     print("[BoosterOpenedViewController] Ошибка загрузки карт: \(error)")
+                    self?.cardLoadFailed = true
+                    self?.cards = []
+                    self?.allFetchedCards = []
+                    self?.collectionView.reloadData()
+                    self?.showCardLoadErrorUI()
+                    self?.setActionButtonsEnabled(false)
                 }
             }
         }
@@ -183,11 +196,10 @@ final class BoosterOpenedViewController: UIViewController {
             // Увеличиваем карту
             cell.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             
-            // Добавляем синюю тень
             cell.layer.shadowColor = UIColor.systemBlue.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 4)
-            cell.layer.shadowRadius = 8
-            cell.layer.shadowOpacity = 0.6
+            cell.layer.shadowOffset = CGSize(width: 0, height: 8)
+            cell.layer.shadowRadius = 12
+            cell.layer.shadowOpacity = 0.7
         })
     }
     
@@ -239,7 +251,28 @@ final class BoosterOpenedViewController: UIViewController {
         }
     }
 
+    // Вспомогательный метод для отображения ошибки загрузки карт
+    private func showCardLoadErrorUI() {
+        // Показываем текст ошибки в totalLabel
+        totalLabel.text = "Не удалось загрузить карты. Проверьте интернет-соединение."
+    }
+
+    // Вспомогательный метод для включения/отключения кнопок действий
+    private func setActionButtonsEnabled(_ enabled: Bool) {
+        keepAllButton.isEnabled = enabled
+        sellAllButton.isEnabled = enabled
+        sellSelectedButton.isEnabled = enabled
+        keepAllButton.alpha = enabled ? 1.0 : 0.5
+        sellAllButton.alpha = enabled ? 1.0 : 0.5
+        sellSelectedButton.alpha = enabled ? 1.0 : 0.5
+    }
+
     @objc private func handleKeepAllTapped() {
+        // Если карты не загружены, ничего не делаем
+        if cardLoadFailed || cards.isEmpty {
+            print("[BoosterOpenedViewController] Нельзя сохранить карты: карты не загружены или их нет")
+            return
+        }
         print("[BoosterOpenedViewController] Пользователь нажал 'Keep All'")
         
         // Сохраняем оставшиеся карты в коллекцию пользователя
@@ -304,6 +337,8 @@ final class BoosterOpenedViewController: UIViewController {
 }
     
     @objc private func handleSellSelectedTapped() {
+        // Если карты не загружены, ничего не делаем
+        if cardLoadFailed || cards.isEmpty { return }
         guard !selectedCards.isEmpty else { return }
         print("[BoosterOpenedViewController] Пользователь продает \(selectedCards.count) выбранных карт")
         // Анимированно удаляем выбранные карты
@@ -338,6 +373,8 @@ final class BoosterOpenedViewController: UIViewController {
         print("[BoosterOpenedViewController] Осталось карт: \(cards.count)")
     }
     @objc private func handleSellAllTapped() {
+        // Если карты не загружены, ничего не делаем
+        if cardLoadFailed || cards.isEmpty { return }
         print("[BoosterOpenedViewController] Пользователь продает все \(cards.count) карт")
         // Считаем сумму продажи всех карт
         let saleValue: Double = cards.compactMap { card in
@@ -392,17 +429,20 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
         // Берём реальную карту
         let card = cards[indexPath.item]
         let isSelected = selectedCards.contains(card.id)
-        
         print("[BoosterOpenedViewController] Отображается карта: id=\(card.id), name=\(card.name), image_url=\(card.image_url ?? "nil"), selected=\(isSelected)")
-        cell.configure(with: card, showBadge: false)
-        
+        // Передаём callback для замены карты, если не удалось загрузить изображение
+        cell.configure(with: card, showBadge: false, onImageLoadFailed: { [weak self] in
+            self?.replaceCardWithNewRandom(at: indexPath.item)
+        })
         // Применяем состояние выбора к ячейке
         if isSelected {
             cell.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            // Добавляем синюю тень (теперь больше и ярче)
+            // Увеличено по просьбе: offset=8, radius=16, opacity=0.8
             cell.layer.shadowColor = UIColor.systemBlue.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 4)
-            cell.layer.shadowRadius = 8
-            cell.layer.shadowOpacity = 0.6
+            cell.layer.shadowOffset = CGSize(width: 0, height: 8)
+            cell.layer.shadowRadius = 16
+            cell.layer.shadowOpacity = 0.8
         } else {
             cell.transform = .identity
             cell.layer.shadowColor = UIColor.clear.cgColor
@@ -410,8 +450,23 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
             cell.layer.shadowRadius = 0
             cell.layer.shadowOpacity = 0
         }
-        
         return cell
+    }
+
+    // Заменяет карту на новую случайную из allFetchedCards, если не удалось загрузить изображение
+    private func replaceCardWithNewRandom(at index: Int) {
+        guard index < cards.count else { return }
+        // Получаем id всех карт, которые уже в бустере
+        let currentIds = Set(cards.map { $0.id })
+        // Фильтруем только те карты, которых ещё нет в бустере
+        let available = allFetchedCards.filter { !currentIds.contains($0.id) && $0.image_url != nil }
+        guard let newCard = available.randomElement() else {
+            print("[BoosterOpenedViewController] Нет доступных карт для замены!")
+            return
+        }
+        print("[BoosterOpenedViewController] Заменяю карту на новую: \(newCard.name)")
+        cards[index] = newCard
+        collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

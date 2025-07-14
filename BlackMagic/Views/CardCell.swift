@@ -47,15 +47,23 @@ final class CardCell: UICollectionViewCell {
         updateSellTitle()
     }
 
-    func configure(with card: Card, showBadge: Bool = true) {
+    func configure(with card: Card, showBadge: Bool = true, onImageLoadFailed: (() -> Void)? = nil) {
         if let url = card.image_url {
             ScryfallServiceManager.shared.loadCardImage(from: url) { [weak self] image in
                 DispatchQueue.main.async {
-                    self?.cardImageView.image = image ?? UIImage(named: card.name)
+                    if let img = image {
+                        self?.cardImageView.image = img
+                    } else {
+                        self?.cardImageView.image = UIImage(named: card.name)
+                        // Если не удалось загрузить изображение — вызываем callback для замены карты
+                        onImageLoadFailed?()
+                    }
                 }
             }
         } else {
             cardImageView.image = UIImage(named: card.name)
+            // Если нет image_url — тоже можно вызвать onImageLoadFailed
+            onImageLoadFailed?()
         }
         badgeCount = card.count
         sellCount = 1
