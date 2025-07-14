@@ -157,6 +157,7 @@ final class TransactionCell: UITableViewCell {
         selectionStyle = .none
         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = .white
+        titleLabel.numberOfLines = 0
         dateLabel.font = .systemFont(ofSize: 12)
         dateLabel.textColor = .lightGray
         amountLabel.font = .boldSystemFont(ofSize: 16)

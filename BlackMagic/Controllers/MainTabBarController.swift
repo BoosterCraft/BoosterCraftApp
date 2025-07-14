@@ -1,6 +1,6 @@
 import UIKit
 
-class MainTabBarController: UITabBarController {
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     // MARK: - Lifecycle
     
@@ -10,6 +10,8 @@ class MainTabBarController: UITabBarController {
         tabBar.tintColor = .systemBlue
         tabBar.barStyle = .black
         tabBar.isTranslucent = true
+        delegate = self // Для отслеживания смены вкладок
+        updateTabBarBlur(for: selectedIndex)
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -78,5 +80,25 @@ class MainTabBarController: UITabBarController {
         ]
         
         selectedIndex = 1
+    }
+    
+    // UITabBarControllerDelegate: вызывается при смене вкладки
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        updateTabBarBlur(for: selectedIndex)
+    }
+
+    // Добавляет или убирает блюр-эффект только для Daily Reward
+    private func updateTabBarBlur(for index: Int) {
+        // Индекс Daily Reward — последний (3)
+        let shouldShowBlur = index == 3
+        // Удаляем все старые блюры
+        tabBar.subviews.filter { $0 is UIVisualEffectView }.forEach { $0.removeFromSuperview() }
+        if shouldShowBlur {
+            let blurEffect = UIBlurEffect(style: .systemMaterialDark)
+            let blurView = UIVisualEffectView(effect: blurEffect)
+            blurView.frame = tabBar.bounds
+            blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            tabBar.insertSubview(blurView, at: 0)
+        }
     }
 }

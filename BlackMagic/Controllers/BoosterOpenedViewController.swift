@@ -196,11 +196,10 @@ final class BoosterOpenedViewController: UIViewController {
             // Увеличиваем карту
             cell.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             
-            // Добавляем синюю тень
             cell.layer.shadowColor = UIColor.systemBlue.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 4)
-            cell.layer.shadowRadius = 8
-            cell.layer.shadowOpacity = 0.6
+            cell.layer.shadowOffset = CGSize(width: 0, height: 8)
+            cell.layer.shadowRadius = 12
+            cell.layer.shadowOpacity = 0.7
         })
     }
     
@@ -438,10 +437,12 @@ extension BoosterOpenedViewController: UICollectionViewDataSource, UICollectionV
         // Применяем состояние выбора к ячейке
         if isSelected {
             cell.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            // Добавляем синюю тень (теперь больше и ярче)
+            // Увеличено по просьбе: offset=8, radius=16, opacity=0.8
             cell.layer.shadowColor = UIColor.systemBlue.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 4)
-            cell.layer.shadowRadius = 8
-            cell.layer.shadowOpacity = 0.6
+            cell.layer.shadowOffset = CGSize(width: 0, height: 8)
+            cell.layer.shadowRadius = 16
+            cell.layer.shadowOpacity = 0.8
         } else {
             cell.transform = .identity
             cell.layer.shadowColor = UIColor.clear.cgColor
